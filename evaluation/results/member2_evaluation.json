@@ -1,0 +1,1517 @@
+{
+  "schema_version": "1.0",
+  "project": "Intelligent CI/CD Pipeline Failure Assistant",
+  "owner": "Member 2",
+  "evaluation_metadata": {
+    "evaluated_at_utc": "2026-11-15T16:13:16.507991+00:00",
+    "python_version": "3.12.9",
+    "platform": "Windows-11-10.0.26300-SP0",
+    "scenario_fixture": "D:\\Bits-AI-ML\\Electives\\6. Agentic AI\\Assignment\\Assignment-1\\AgenticAI-CICD-Assitant_Group5\\data\\scenarios.json",
+    "scenario_loader": "scenario_loader.py (Member 4 shared loader)",
+    "learning_baseline_policy": "Fresh zero-count temporary experience file per scenario.",
+    "expected_data_policy": "expected_for() is evaluator-only; every agent input is obtained through agent_input()."
+  },
+  "evaluation_design": {
+    "primary_scenarios": [
+      "A",
+      "B",
+      "C"
+    ],
+    "robustness_scenarios": [
+      "D",
+      "E"
+    ],
+    "metrics": [
+      "classification_accuracy",
+      "evidence_precision_recall_f1",
+      "recommendation_appropriateness",
+      "explanation_completeness",
+      "learning_before_after_feedback"
+    ],
+    "evidence_reference_policy": "Evaluator-authored scenario-specific logical evidence mapping; aliases are normalized.",
+    "recommendation_policy": "Case-insensitive token matching with light suffix normalization against expected.acceptable_next_steps.",
+    "explanation_policy": "Four binary checks: meaningful likely cause, informative reasoning, decision rationale, actionable verification checklist."
+  },
+  "results": [
+    {
+      "evaluation_id": "EVAL-UTILITY-BASED-A",
+      "agent": "Utility-Based Agent",
+      "scenario_id": "A",
+      "scenario_name": "Unit Test Failure After Code Change",
+      "evaluation_group": "primary",
+      "expected_category": "unit_test",
+      "agent_input_excluded_expected": true,
+      "actual_category": "unit_test",
+      "classification": {
+        "expected_category": "unit_test",
+        "actual_category": "unit_test",
+        "correct": true,
+        "score": 1.0
+      },
+      "evidence_metrics": {
+        "expected_sources": [
+          "build_logs",
+          "pipeline_status",
+          "recent_changes",
+          "test_results"
+        ],
+        "predicted_sources": [
+          "build_logs",
+          "dependencies",
+          "pipeline_status",
+          "recent_changes",
+          "test_results"
+        ],
+        "true_positive": 4,
+        "false_positive": 1,
+        "false_negative": 0,
+        "precision": 0.8,
+        "recall": 1.0,
+        "f1_score": 0.8889
+      },
+      "recommendation": {
+        "appropriate": true,
+        "score": 1.0,
+        "matched_acceptable_steps": [
+          "failing test",
+          "failed test",
+          "test result"
+        ],
+        "acceptable_next_steps": [
+          "failing test",
+          "failed test",
+          "test result",
+          "recent code",
+          "modified",
+          "changed function",
+          "regression"
+        ]
+      },
+      "explanation_completeness": {
+        "checks": {
+          "likely_cause_explained": true,
+          "reasoning_provided": true,
+          "decision_rationale_present": true,
+          "verification_checklist_actionable": true
+        },
+        "score": 4,
+        "maximum_score": 4,
+        "percentage": 1.0
+      },
+      "contract": {
+        "valid": true,
+        "problems": []
+      },
+      "scenario_unchanged": true,
+      "agent_output": {
+        "agent": "Utility-Based Agent",
+        "failure_category": "unit_test",
+        "supporting_evidence": [
+          "Pipeline status: {'build': 'passed', 'tests': 'failed', 'deployment': 'not_started'}",
+          "Build logs: [build] Installing dependencies from requirements.txt ... done\n[build] Compiling payments-service ... done\n[build] Build completed successfully in 48s\n[test] Running 20 tests with pytest\n[test] FAILED tests/test_validator.py::test_rejects_expired_card - AssertionError: expected ValidationError, got None\n[test] FAILED tests/test_validator.py::test_amount_upper_limit - AssertionError: assert 200 == 422\n[test] 18 passed, 2 failed in 6.3s\n[pipeline] Stage 'tests' failed; deployment skipped",
+          "Test results: {'total': 20, 'passed': 18, 'failed': 2, 'skipped': 0, 'failed_tests': [{'name': 'tests/test_validator.py::test_rejects_expired_card', 'error': 'AssertionError: expected ValidationError, got None'}, {'name': 'tests/test_validator.py::test_amount_upper_limit', 'error': 'AssertionError: assert 200 == 422'}]}",
+          "Recent changes: ['Commit a1f3c9e: Modified validate_payment() in payments/validator.py (expiry and amount checks refactored)', 'Commit 7be2d10: Updated docstrings in payments/models.py']",
+          "Dependency information: {'status': 'resolved', 'changed': [], 'notes': 'No dependency changes in this run.'}"
+        ],
+        "likely_cause": "Possible regression in recently modified code.",
+        "recommended_step": "Inspect failed unit test results",
+        "reasoning": "Selected inspect_tests because it achieved the highest utility score of 0.8050. The decision considers estimated success probability, evidence relevance, safety and troubleshooting cost.",
+        "verification_checklist": [
+          "Review the diagnostic findings.",
+          "Apply an appropriate fix through the normal development process.",
+          "Rerun the affected pipeline stage.",
+          "Confirm the complete pipeline is healthy."
+        ],
+        "utility_score": 0.805,
+        "candidate_scores": [
+          {
+            "id": "inspect_tests",
+            "step": "Inspect failed unit test results",
+            "success_probability": 0.85,
+            "evidence_relevance": 0.95,
+            "safety": 1.0,
+            "cost": 0.2,
+            "utility_score": 0.805
+          },
+          {
+            "id": "inspect_changes",
+            "step": "Review recently modified code",
+            "success_probability": 0.8,
+            "evidence_relevance": 0.9,
+            "safety": 1.0,
+            "cost": 0.25,
+            "utility_score": 0.765
+          },
+          {
+            "id": "inspect_pipeline",
+            "step": "Investigate the complete pipeline",
+            "success_probability": 0.6,
+            "evidence_relevance": 0.65,
+            "safety": 1.0,
+            "cost": 0.7,
+            "utility_score": 0.565
+          }
+        ]
+      },
+      "error": null,
+      "evaluation_valid": true
+    },
+    {
+      "evaluation_id": "EVAL-LEARNING-BASED-A",
+      "agent": "Learning-Based Agent",
+      "scenario_id": "A",
+      "scenario_name": "Unit Test Failure After Code Change",
+      "evaluation_group": "primary",
+      "expected_category": "unit_test",
+      "agent_input_excluded_expected": true,
+      "actual_category": "unit_test",
+      "classification": {
+        "expected_category": "unit_test",
+        "actual_category": "unit_test",
+        "correct": true,
+        "score": 1.0
+      },
+      "evidence_metrics": {
+        "expected_sources": [
+          "build_logs",
+          "pipeline_status",
+          "recent_changes",
+          "test_results"
+        ],
+        "predicted_sources": [
+          "build_logs",
+          "dependencies",
+          "pipeline_status",
+          "recent_changes",
+          "test_results"
+        ],
+        "true_positive": 4,
+        "false_positive": 1,
+        "false_negative": 0,
+        "precision": 0.8,
+        "recall": 1.0,
+        "f1_score": 0.8889
+      },
+      "recommendation": {
+        "appropriate": true,
+        "score": 1.0,
+        "matched_acceptable_steps": [
+          "failing test",
+          "failed test",
+          "test result"
+        ],
+        "acceptable_next_steps": [
+          "failing test",
+          "failed test",
+          "test result",
+          "recent code",
+          "modified",
+          "changed function",
+          "regression"
+        ]
+      },
+      "explanation_completeness": {
+        "checks": {
+          "likely_cause_explained": true,
+          "reasoning_provided": true,
+          "decision_rationale_present": true,
+          "verification_checklist_actionable": true
+        },
+        "score": 4,
+        "maximum_score": 4,
+        "percentage": 1.0
+      },
+      "contract": {
+        "valid": true,
+        "problems": []
+      },
+      "scenario_unchanged": true,
+      "agent_output": {
+        "agent": "Learning-Based Agent",
+        "failure_category": "unit_test",
+        "supporting_evidence": [
+          "Pipeline status (pipeline_status): {'build': 'passed', 'tests': 'failed', 'deployment': 'not_started'}",
+          "Build logs (build_logs): [build] Installing dependencies from requirements.txt ... done\n[build] Compiling payments-service ... done\n[build] Build completed successfully in 48s\n[test] Running 20 tests with pytest\n[test] FAILED tests/test_validator.py::test_rejects_expired_card - AssertionError: expected ValidationError, got None\n[test] FAILED tests/test_validator.py::test_amount_upper_limit - AssertionError: assert 200 == 422\n[test] 18 passed, 2 failed in 6.3s\n[pipeline] Stage 'tests' failed; deployment skipped",
+          "Test results (test_results): {'total': 20, 'passed': 18, 'failed': 2, 'skipped': 0, 'failed_tests': [{'name': 'tests/test_validator.py::test_rejects_expired_card', 'error': 'AssertionError: expected ValidationError, got None'}, {'name': 'tests/test_validator.py::test_amount_upper_limit', 'error': 'AssertionError: assert 200 == 422'}]}",
+          "Dependency information (dependencies): {'status': 'resolved', 'changed': [], 'notes': 'No dependency changes in this run.'}",
+          "Recent changes (recent_changes): ['Commit a1f3c9e: Modified validate_payment() in payments/validator.py (expiry and amount checks refactored)', 'Commit 7be2d10: Updated docstrings in payments/models.py']"
+        ],
+        "likely_cause": "The underlying cause is not established; the recommendation is based on the available evidence and historical troubleshooting outcomes.",
+        "recommended_step": "Inspect failed unit test results",
+        "reasoning": "Selected 'inspect_tests' with a learning score of 0.6543. The score combines its Laplace-smoothed historical success rate (0.5000, weight 60%) and scenario evidence relevance (0.8857, weight 40%).",
+        "verification_checklist": [
+          "Execute the recommended diagnostic action.",
+          "Verify whether the diagnostic action achieved its intended outcome.",
+          "Provide explicit success or failure feedback to update experience."
+        ],
+        "selected_action_id": "inspect_tests",
+        "success_rate": 0.5,
+        "evidence_relevance": 0.8857,
+        "learning_score": 0.6543,
+        "candidate_scores": [
+          {
+            "action_id": "inspect_tests",
+            "recommended_step": "Inspect failed unit test results",
+            "success": 0,
+            "failure": 0,
+            "success_rate": 0.5,
+            "evidence_relevance": 0.8857,
+            "learning_score": 0.6543,
+            "matched_fields": [
+              "test_results",
+              "build_logs"
+            ],
+            "matched_field_groups": [
+              [
+                "test_results"
+              ],
+              [
+                "build_logs"
+              ]
+            ],
+            "matched_keywords": [
+              "test",
+              "tests",
+              "failed",
+              "assert",
+              "error"
+            ]
+          },
+          {
+            "action_id": "inspect_changes",
+            "recommended_step": "Review recently modified code",
+            "success": 0,
+            "failure": 0,
+            "success_rate": 0.5,
+            "evidence_relevance": 0.7714,
+            "learning_score": 0.6086,
+            "matched_fields": [
+              "recent_changes",
+              "test_results"
+            ],
+            "matched_field_groups": [
+              [
+                "recent_changes"
+              ],
+              [
+                "test_results"
+              ]
+            ],
+            "matched_keywords": [
+              "modified",
+              "updated",
+              "commit"
+            ]
+          },
+          {
+            "action_id": "inspect_pipeline",
+            "recommended_step": "Investigate the complete pipeline",
+            "success": 0,
+            "failure": 0,
+            "success_rate": 0.5,
+            "evidence_relevance": 0.6,
+            "learning_score": 0.54,
+            "matched_fields": [
+              "pipeline_status"
+            ],
+            "matched_field_groups": [
+              [
+                "pipeline_status"
+              ]
+            ],
+            "matched_keywords": []
+          }
+        ],
+        "experience_used": {
+          "selection_formula": "learning_score = 0.60 * smoothed_success_rate + 0.40 * evidence_relevance",
+          "history_weight": 0.6,
+          "evidence_weight": 0.4,
+          "candidates": [
+            {
+              "action_id": "inspect_tests",
+              "success": 0,
+              "failure": 0,
+              "smoothed_success_rate": 0.5
+            },
+            {
+              "action_id": "inspect_changes",
+              "success": 0,
+              "failure": 0,
+              "smoothed_success_rate": 0.5
+            },
+            {
+              "action_id": "inspect_pipeline",
+              "success": 0,
+              "failure": 0,
+              "smoothed_success_rate": 0.5
+            }
+          ]
+        }
+      },
+      "error": null,
+      "evaluation_valid": true
+    },
+    {
+      "evaluation_id": "EVAL-UTILITY-BASED-B",
+      "agent": "Utility-Based Agent",
+      "scenario_id": "B",
+      "scenario_name": "Dependency Version Unavailable / Incompatible",
+      "evaluation_group": "primary",
+      "expected_category": "dependency",
+      "agent_input_excluded_expected": true,
+      "actual_category": "dependency",
+      "classification": {
+        "expected_category": "dependency",
+        "actual_category": "dependency",
+        "correct": true,
+        "score": 1.0
+      },
+      "evidence_metrics": {
+        "expected_sources": [
+          "build_logs",
+          "dependencies",
+          "pipeline_status",
+          "recent_changes"
+        ],
+        "predicted_sources": [
+          "build_logs",
+          "dependencies",
+          "pipeline_status",
+          "recent_changes",
+          "test_results"
+        ],
+        "true_positive": 4,
+        "false_positive": 1,
+        "false_negative": 0,
+        "precision": 0.8,
+        "recall": 1.0,
+        "f1_score": 0.8889
+      },
+      "recommendation": {
+        "appropriate": true,
+        "score": 1.0,
+        "matched_acceptable_steps": [
+          "dependency",
+          "version"
+        ],
+        "acceptable_next_steps": [
+          "dependency",
+          "version",
+          "compatib",
+          "build log",
+          "registry",
+          "package"
+        ]
+      },
+      "explanation_completeness": {
+        "checks": {
+          "likely_cause_explained": true,
+          "reasoning_provided": true,
+          "decision_rationale_present": true,
+          "verification_checklist_actionable": true
+        },
+        "score": 4,
+        "maximum_score": 4,
+        "percentage": 1.0
+      },
+      "contract": {
+        "valid": true,
+        "problems": []
+      },
+      "scenario_unchanged": true,
+      "agent_output": {
+        "agent": "Utility-Based Agent",
+        "failure_category": "dependency",
+        "supporting_evidence": [
+          "Pipeline status: {'build': 'failed', 'tests': 'not_started', 'deployment': 'not_started'}",
+          "Build logs: [build] Installing dependencies from requirements.txt\n[build] Collecting requests==2.31.0 ... ok\n[build] Collecting pydantic==3.9.1\n[build] ERROR: Could not find a version that satisfies the requirement pydantic==3.9.1 (from versions: 1.10.13, 2.5.3, 2.7.4)\n[build] ERROR: No matching distribution found for pydantic==3.9.1\n[build] Build failed: dependency resolution error (exit code 1)\n[pipeline] Stage 'build' failed; tests and deployment skipped",
+          "Test results: {'total': 0, 'passed': 0, 'failed': 0, 'skipped': 0, 'failed_tests': [], 'notes': 'Tests did not run because the build failed.'}",
+          "Recent changes: ['Commit c42e8b1: Bumped pydantic from 2.7.4 to 3.9.1 in requirements.txt', 'Commit 0d91aa4: Updated CI cache key']",
+          "Dependency information: {'status': 'unresolved', 'changed': [{'package': 'pydantic', 'from': '2.7.4', 'to': '3.9.1', 'available': False}, {'package': 'requests', 'from': '2.31.0', 'to': '2.31.0', 'available': True}], 'notes': 'pydantic 3.9.1 is not published on the configured package index.'}"
+        ],
+        "likely_cause": "Possible unavailable or incompatible dependency version.",
+        "recommended_step": "Check dependency versions and compatibility",
+        "reasoning": "Selected inspect_versions because it achieved the highest utility score of 0.8340. The decision considers estimated success probability, evidence relevance, safety and troubleshooting cost.",
+        "verification_checklist": [
+          "Review the diagnostic findings.",
+          "Apply an appropriate fix through the normal development process.",
+          "Rerun the affected pipeline stage.",
+          "Confirm the complete pipeline is healthy."
+        ],
+        "utility_score": 0.834,
+        "candidate_scores": [
+          {
+            "id": "inspect_versions",
+            "step": "Check dependency versions and compatibility",
+            "success_probability": 0.9,
+            "evidence_relevance": 0.98,
+            "safety": 1.0,
+            "cost": 0.2,
+            "utility_score": 0.834
+          },
+          {
+            "id": "inspect_build_logs",
+            "step": "Inspect dependency resolution build logs",
+            "success_probability": 0.85,
+            "evidence_relevance": 0.95,
+            "safety": 1.0,
+            "cost": 0.2,
+            "utility_score": 0.805
+          },
+          {
+            "id": "inspect_package_index",
+            "step": "Check package registry availability",
+            "success_probability": 0.75,
+            "evidence_relevance": 0.85,
+            "safety": 1.0,
+            "cost": 0.3,
+            "utility_score": 0.725
+          }
+        ]
+      },
+      "error": null,
+      "evaluation_valid": true
+    },
+    {
+      "evaluation_id": "EVAL-LEARNING-BASED-B",
+      "agent": "Learning-Based Agent",
+      "scenario_id": "B",
+      "scenario_name": "Dependency Version Unavailable / Incompatible",
+      "evaluation_group": "primary",
+      "expected_category": "dependency",
+      "agent_input_excluded_expected": true,
+      "actual_category": "dependency",
+      "classification": {
+        "expected_category": "dependency",
+        "actual_category": "dependency",
+        "correct": true,
+        "score": 1.0
+      },
+      "evidence_metrics": {
+        "expected_sources": [
+          "build_logs",
+          "dependencies",
+          "pipeline_status",
+          "recent_changes"
+        ],
+        "predicted_sources": [
+          "build_logs",
+          "dependencies",
+          "pipeline_status",
+          "recent_changes",
+          "test_results"
+        ],
+        "true_positive": 4,
+        "false_positive": 1,
+        "false_negative": 0,
+        "precision": 0.8,
+        "recall": 1.0,
+        "f1_score": 0.8889
+      },
+      "recommendation": {
+        "appropriate": true,
+        "score": 1.0,
+        "matched_acceptable_steps": [
+          "dependency",
+          "version"
+        ],
+        "acceptable_next_steps": [
+          "dependency",
+          "version",
+          "compatib",
+          "build log",
+          "registry",
+          "package"
+        ]
+      },
+      "explanation_completeness": {
+        "checks": {
+          "likely_cause_explained": true,
+          "reasoning_provided": true,
+          "decision_rationale_present": true,
+          "verification_checklist_actionable": true
+        },
+        "score": 4,
+        "maximum_score": 4,
+        "percentage": 1.0
+      },
+      "contract": {
+        "valid": true,
+        "problems": []
+      },
+      "scenario_unchanged": true,
+      "agent_output": {
+        "agent": "Learning-Based Agent",
+        "failure_category": "dependency",
+        "supporting_evidence": [
+          "Pipeline status (pipeline_status): {'build': 'failed', 'tests': 'not_started', 'deployment': 'not_started'}",
+          "Build logs (build_logs): [build] Installing dependencies from requirements.txt\n[build] Collecting requests==2.31.0 ... ok\n[build] Collecting pydantic==3.9.1\n[build] ERROR: Could not find a version that satisfies the requirement pydantic==3.9.1 (from versions: 1.10.13, 2.5.3, 2.7.4)\n[build] ERROR: No matching distribution found for pydantic==3.9.1\n[build] Build failed: dependency resolution error (exit code 1)\n[pipeline] Stage 'build' failed; tests and deployment skipped",
+          "Test results (test_results): {'total': 0, 'passed': 0, 'failed': 0, 'skipped': 0, 'failed_tests': [], 'notes': 'Tests did not run because the build failed.'}",
+          "Dependency information (dependencies): {'status': 'unresolved', 'changed': [{'package': 'pydantic', 'from': '2.7.4', 'to': '3.9.1', 'available': False}, {'package': 'requests', 'from': '2.31.0', 'to': '2.31.0', 'available': True}], 'notes': 'pydantic 3.9.1 is not published on the configured package index.'}",
+          "Recent changes (recent_changes): ['Commit c42e8b1: Bumped pydantic from 2.7.4 to 3.9.1 in requirements.txt', 'Commit 0d91aa4: Updated CI cache key']"
+        ],
+        "likely_cause": "The underlying cause is not established; the recommendation is based on the available evidence and historical troubleshooting outcomes.",
+        "recommended_step": "Check dependency versions and compatibility",
+        "reasoning": "Selected 'inspect_versions' with a learning score of 0.6800. The score combines its Laplace-smoothed historical success rate (0.5000, weight 60%) and scenario evidence relevance (0.9500, weight 40%).",
+        "verification_checklist": [
+          "Execute the recommended diagnostic action.",
+          "Verify whether the diagnostic action achieved its intended outcome.",
+          "Provide explicit success or failure feedback to update experience."
+        ],
+        "selected_action_id": "inspect_versions",
+        "success_rate": 0.5,
+        "evidence_relevance": 0.95,
+        "learning_score": 0.68,
+        "candidate_scores": [
+          {
+            "action_id": "inspect_versions",
+            "recommended_step": "Check dependency versions and compatibility",
+            "success": 0,
+            "failure": 0,
+            "success_rate": 0.5,
+            "evidence_relevance": 0.95,
+            "learning_score": 0.68,
+            "matched_fields": [
+              "dependencies",
+              "build_logs"
+            ],
+            "matched_field_groups": [
+              [
+                "dependencies"
+              ],
+              [
+                "build_logs"
+              ]
+            ],
+            "matched_keywords": [
+              "version",
+              "versions",
+              "dependency",
+              "dependencies",
+              "requirements",
+              "package",
+              "resolution"
+            ]
+          },
+          {
+            "action_id": "inspect_build_logs",
+            "recommended_step": "Inspect dependency resolution build logs",
+            "success": 0,
+            "failure": 0,
+            "success_rate": 0.5,
+            "evidence_relevance": 0.8286,
+            "learning_score": 0.6314,
+            "matched_fields": [
+              "build_logs",
+              "pipeline_status"
+            ],
+            "matched_field_groups": [
+              [
+                "build_logs"
+              ],
+              [
+                "pipeline_status"
+              ]
+            ],
+            "matched_keywords": [
+              "build",
+              "failed",
+              "error",
+              "dependency"
+            ]
+          },
+          {
+            "action_id": "inspect_package_index",
+            "recommended_step": "Check package registry availability",
+            "success": 0,
+            "failure": 0,
+            "success_rate": 0.5,
+            "evidence_relevance": 0.7714,
+            "learning_score": 0.6086,
+            "matched_fields": [
+              "dependencies",
+              "build_logs"
+            ],
+            "matched_field_groups": [
+              [
+                "dependencies"
+              ],
+              [
+                "build_logs"
+              ]
+            ],
+            "matched_keywords": [
+              "index",
+              "package",
+              "package index"
+            ]
+          }
+        ],
+        "experience_used": {
+          "selection_formula": "learning_score = 0.60 * smoothed_success_rate + 0.40 * evidence_relevance",
+          "history_weight": 0.6,
+          "evidence_weight": 0.4,
+          "candidates": [
+            {
+              "action_id": "inspect_versions",
+              "success": 0,
+              "failure": 0,
+              "smoothed_success_rate": 0.5
+            },
+            {
+              "action_id": "inspect_build_logs",
+              "success": 0,
+              "failure": 0,
+              "smoothed_success_rate": 0.5
+            },
+            {
+              "action_id": "inspect_package_index",
+              "success": 0,
+              "failure": 0,
+              "smoothed_success_rate": 0.5
+            }
+          ]
+        }
+      },
+      "error": null,
+      "evaluation_valid": true
+    },
+    {
+      "evaluation_id": "EVAL-UTILITY-BASED-C",
+      "agent": "Utility-Based Agent",
+      "scenario_id": "C",
+      "scenario_name": "Deployment Health Check Failure After Release",
+      "evaluation_group": "primary",
+      "expected_category": "deployment",
+      "agent_input_excluded_expected": true,
+      "actual_category": "deployment",
+      "classification": {
+        "expected_category": "deployment",
+        "actual_category": "deployment",
+        "correct": true,
+        "score": 1.0
+      },
+      "evidence_metrics": {
+        "expected_sources": [
+          "build_logs",
+          "deployment_logs",
+          "health_checks",
+          "pipeline_status",
+          "recent_changes",
+          "test_results"
+        ],
+        "predicted_sources": [
+          "build_logs",
+          "dependencies",
+          "deployment_logs",
+          "health_checks",
+          "pipeline_status",
+          "recent_changes",
+          "test_results"
+        ],
+        "true_positive": 6,
+        "false_positive": 1,
+        "false_negative": 0,
+        "precision": 0.8571,
+        "recall": 1.0,
+        "f1_score": 0.9231
+      },
+      "recommendation": {
+        "appropriate": true,
+        "score": 1.0,
+        "matched_acceptable_steps": [
+          "health",
+          "deployment"
+        ],
+        "acceptable_next_steps": [
+          "health",
+          "runtime",
+          "deployment",
+          "configuration",
+          "logs"
+        ]
+      },
+      "explanation_completeness": {
+        "checks": {
+          "likely_cause_explained": true,
+          "reasoning_provided": true,
+          "decision_rationale_present": true,
+          "verification_checklist_actionable": true
+        },
+        "score": 4,
+        "maximum_score": 4,
+        "percentage": 1.0
+      },
+      "contract": {
+        "valid": true,
+        "problems": []
+      },
+      "scenario_unchanged": true,
+      "agent_output": {
+        "agent": "Utility-Based Agent",
+        "failure_category": "deployment",
+        "supporting_evidence": [
+          "Pipeline status: {'build': 'passed', 'tests': 'passed', 'deployment': 'failed'}",
+          "Build logs: [build] Build completed successfully in 52s\n[test] 64 passed in 11.2s\n[deploy] Deploying inventory-service v1.8.0 to staging\n[deploy] Rolling update started (3 replicas)\n[deploy] Readiness probe failed: GET /health returned 503 (attempt 1/5)\n[deploy] Readiness probe failed: GET /health returned 503 (attempt 5/5)\n[deploy] Deployment health check failed; release marked unhealthy",
+          "Test results: {'total': 64, 'passed': 64, 'failed': 0, 'skipped': 0, 'failed_tests': []}",
+          "Recent changes: ['Commit 9f0b7c2: Renamed environment variable DB_URL to DATABASE_URL in config/settings.py', 'Commit 55ad3e8: Increased connection pool size']",
+          "Health checks: {'endpoint': '/health', 'expected_status': 200, 'observed_status': 503, 'attempts': 5, 'passed': 0, 'message': 'Service Unavailable: database connection not configured'}",
+          "Dependency information: {'status': 'resolved', 'changed': [], 'notes': 'No dependency changes in this run.'}",
+          "Deployment/runtime logs: [app] Starting inventory-service v1.8.0\n[app] ERROR: KeyError: 'DATABASE_URL' environment variable not set\n[app] Health endpoint reporting 503: database connection not configured"
+        ],
+        "likely_cause": "Possible runtime or deployment configuration issue.",
+        "recommended_step": "Inspect deployment health-check results",
+        "reasoning": "Selected inspect_health because it achieved the highest utility score of 0.8340. The decision considers estimated success probability, evidence relevance, safety and troubleshooting cost.",
+        "verification_checklist": [
+          "Review the diagnostic findings.",
+          "Apply an appropriate fix through the normal development process.",
+          "Rerun the affected pipeline stage.",
+          "Confirm the complete pipeline is healthy."
+        ],
+        "utility_score": 0.834,
+        "candidate_scores": [
+          {
+            "id": "inspect_health",
+            "step": "Inspect deployment health-check results",
+            "success_probability": 0.9,
+            "evidence_relevance": 0.98,
+            "safety": 1.0,
+            "cost": 0.2,
+            "utility_score": 0.834
+          },
+          {
+            "id": "inspect_runtime_logs",
+            "step": "Inspect application runtime logs",
+            "success_probability": 0.85,
+            "evidence_relevance": 0.95,
+            "safety": 1.0,
+            "cost": 0.25,
+            "utility_score": 0.8
+          },
+          {
+            "id": "inspect_deployment_changes",
+            "step": "Review recent deployment configuration changes",
+            "success_probability": 0.8,
+            "evidence_relevance": 0.9,
+            "safety": 1.0,
+            "cost": 0.3,
+            "utility_score": 0.76
+          }
+        ]
+      },
+      "error": null,
+      "evaluation_valid": true
+    },
+    {
+      "evaluation_id": "EVAL-LEARNING-BASED-C",
+      "agent": "Learning-Based Agent",
+      "scenario_id": "C",
+      "scenario_name": "Deployment Health Check Failure After Release",
+      "evaluation_group": "primary",
+      "expected_category": "deployment",
+      "agent_input_excluded_expected": true,
+      "actual_category": "deployment",
+      "classification": {
+        "expected_category": "deployment",
+        "actual_category": "deployment",
+        "correct": true,
+        "score": 1.0
+      },
+      "evidence_metrics": {
+        "expected_sources": [
+          "build_logs",
+          "deployment_logs",
+          "health_checks",
+          "pipeline_status",
+          "recent_changes",
+          "test_results"
+        ],
+        "predicted_sources": [
+          "build_logs",
+          "dependencies",
+          "deployment_logs",
+          "health_checks",
+          "pipeline_status",
+          "recent_changes",
+          "test_results"
+        ],
+        "true_positive": 6,
+        "false_positive": 1,
+        "false_negative": 0,
+        "precision": 0.8571,
+        "recall": 1.0,
+        "f1_score": 0.9231
+      },
+      "recommendation": {
+        "appropriate": true,
+        "score": 1.0,
+        "matched_acceptable_steps": [
+          "health",
+          "deployment"
+        ],
+        "acceptable_next_steps": [
+          "health",
+          "runtime",
+          "deployment",
+          "configuration",
+          "logs"
+        ]
+      },
+      "explanation_completeness": {
+        "checks": {
+          "likely_cause_explained": true,
+          "reasoning_provided": true,
+          "decision_rationale_present": true,
+          "verification_checklist_actionable": true
+        },
+        "score": 4,
+        "maximum_score": 4,
+        "percentage": 1.0
+      },
+      "contract": {
+        "valid": true,
+        "problems": []
+      },
+      "scenario_unchanged": true,
+      "agent_output": {
+        "agent": "Learning-Based Agent",
+        "failure_category": "deployment",
+        "supporting_evidence": [
+          "Pipeline status (pipeline_status): {'build': 'passed', 'tests': 'passed', 'deployment': 'failed'}",
+          "Build logs (build_logs): [build] Build completed successfully in 52s\n[test] 64 passed in 11.2s\n[deploy] Deploying inventory-service v1.8.0 to staging\n[deploy] Rolling update started (3 replicas)\n[deploy] Readiness probe failed: GET /health returned 503 (attempt 1/5)\n[deploy] Readiness probe failed: GET /health returned 503 (attempt 5/5)\n[deploy] Deployment health check failed; release marked unhealthy",
+          "Test results (test_results): {'total': 64, 'passed': 64, 'failed': 0, 'skipped': 0, 'failed_tests': []}",
+          "Dependency information (dependencies): {'status': 'resolved', 'changed': [], 'notes': 'No dependency changes in this run.'}",
+          "Recent changes (recent_changes): ['Commit 9f0b7c2: Renamed environment variable DB_URL to DATABASE_URL in config/settings.py', 'Commit 55ad3e8: Increased connection pool size']",
+          "Health checks (health_checks): {'endpoint': '/health', 'expected_status': 200, 'observed_status': 503, 'attempts': 5, 'passed': 0, 'message': 'Service Unavailable: database connection not configured'}",
+          "Deployment/runtime logs (deployment_logs): [app] Starting inventory-service v1.8.0\n[app] ERROR: KeyError: 'DATABASE_URL' environment variable not set\n[app] Health endpoint reporting 503: database connection not configured"
+        ],
+        "likely_cause": "The underlying cause is not established; the recommendation is based on the available evidence and historical troubleshooting outcomes.",
+        "recommended_step": "Inspect deployment health-check results",
+        "reasoning": "Selected 'inspect_health' with a learning score of 0.6314. The score combines its Laplace-smoothed historical success rate (0.5000, weight 60%) and scenario evidence relevance (0.8286, weight 40%).",
+        "verification_checklist": [
+          "Execute the recommended diagnostic action.",
+          "Verify whether the diagnostic action achieved its intended outcome.",
+          "Provide explicit success or failure feedback to update experience."
+        ],
+        "selected_action_id": "inspect_health",
+        "success_rate": 0.5,
+        "evidence_relevance": 0.8286,
+        "learning_score": 0.6314,
+        "candidate_scores": [
+          {
+            "action_id": "inspect_health",
+            "recommended_step": "Inspect deployment health-check results",
+            "success": 0,
+            "failure": 0,
+            "success_rate": 0.5,
+            "evidence_relevance": 0.8286,
+            "learning_score": 0.6314,
+            "matched_fields": [
+              "health_checks",
+              "pipeline_status"
+            ],
+            "matched_field_groups": [
+              [
+                "health_checks"
+              ],
+              [
+                "pipeline_status"
+              ]
+            ],
+            "matched_keywords": [
+              "health",
+              "503",
+              "endpoint",
+              "failed"
+            ]
+          },
+          {
+            "action_id": "inspect_runtime_logs",
+            "recommended_step": "Inspect application runtime logs",
+            "success": 0,
+            "failure": 0,
+            "success_rate": 0.5,
+            "evidence_relevance": 0.6667,
+            "learning_score": 0.5667,
+            "matched_fields": [
+              "deployment_logs",
+              "build_logs",
+              "health_checks"
+            ],
+            "matched_field_groups": [
+              [
+                "deployment_logs"
+              ],
+              [
+                "build_logs"
+              ],
+              [
+                "health_checks"
+              ]
+            ],
+            "matched_keywords": [
+              "error"
+            ]
+          },
+          {
+            "action_id": "inspect_deployment_changes",
+            "recommended_step": "Review recent deployment configuration changes",
+            "success": 0,
+            "failure": 0,
+            "success_rate": 0.5,
+            "evidence_relevance": 0.7143,
+            "learning_score": 0.5857,
+            "matched_fields": [
+              "recent_changes",
+              "health_checks"
+            ],
+            "matched_field_groups": [
+              [
+                "recent_changes"
+              ],
+              [
+                "health_checks"
+              ]
+            ],
+            "matched_keywords": [
+              "config",
+              "environment"
+            ]
+          }
+        ],
+        "experience_used": {
+          "selection_formula": "learning_score = 0.60 * smoothed_success_rate + 0.40 * evidence_relevance",
+          "history_weight": 0.6,
+          "evidence_weight": 0.4,
+          "candidates": [
+            {
+              "action_id": "inspect_health",
+              "success": 0,
+              "failure": 0,
+              "smoothed_success_rate": 0.5
+            },
+            {
+              "action_id": "inspect_runtime_logs",
+              "success": 0,
+              "failure": 0,
+              "smoothed_success_rate": 0.5
+            },
+            {
+              "action_id": "inspect_deployment_changes",
+              "success": 0,
+              "failure": 0,
+              "smoothed_success_rate": 0.5
+            }
+          ]
+        }
+      },
+      "error": null,
+      "evaluation_valid": true
+    },
+    {
+      "evaluation_id": "EVAL-UTILITY-BASED-D",
+      "agent": "Utility-Based Agent",
+      "scenario_id": "D",
+      "scenario_name": "Ambiguous: Test Stage Timed Out With Incomplete Logs",
+      "evaluation_group": "robustness",
+      "expected_category": "unknown",
+      "agent_input_excluded_expected": true,
+      "actual_category": "unknown",
+      "classification": {
+        "expected_category": "unknown",
+        "actual_category": "unknown",
+        "correct": true,
+        "score": 1.0
+      },
+      "evidence_metrics": {
+        "expected_sources": [
+          "build_logs",
+          "dependencies",
+          "pipeline_status",
+          "test_results"
+        ],
+        "predicted_sources": [
+          "build_logs",
+          "dependencies",
+          "pipeline_status",
+          "test_results"
+        ],
+        "true_positive": 4,
+        "false_positive": 0,
+        "false_negative": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0
+      },
+      "recommendation": {
+        "appropriate": true,
+        "score": 1.0,
+        "matched_acceptable_steps": [
+          "collect",
+          "rerun",
+          "logs"
+        ],
+        "acceptable_next_steps": [
+          "collect",
+          "evidence",
+          "missing",
+          "rerun",
+          "additional",
+          "status",
+          "logs",
+          "timed out",
+          "timeout"
+        ]
+      },
+      "explanation_completeness": {
+        "checks": {
+          "likely_cause_explained": true,
+          "reasoning_provided": true,
+          "decision_rationale_present": true,
+          "verification_checklist_actionable": true
+        },
+        "score": 4,
+        "maximum_score": 4,
+        "percentage": 1.0
+      },
+      "contract": {
+        "valid": true,
+        "problems": []
+      },
+      "scenario_unchanged": true,
+      "agent_output": {
+        "agent": "Utility-Based Agent",
+        "failure_category": "unknown",
+        "supporting_evidence": [
+          "Pipeline status: {'build': 'passed', 'tests': 'timed_out', 'deployment': 'not_started'}",
+          "Build logs: [build] Build completed successfully in 40s\n[test] Running test suite ...\n[test] ... (log truncated: runner lost connection after 30m)\n[pipeline] Stage 'tests' exceeded time limit",
+          "Test results: {'total': None, 'passed': None, 'failed': None, 'skipped': None, 'failed_tests': [], 'notes': 'No test report produced (runner timed out).'}",
+          "Dependency information: {'status': 'unknown', 'changed': [], 'notes': 'Dependency information unavailable.'}"
+        ],
+        "likely_cause": "The available evidence is insufficient to determine the failure cause.",
+        "recommended_step": "Collect complete pipeline logs and diagnostic reports, then rerun the affected pipeline stage with sufficient logging.",
+        "reasoning": "The failure category is unknown or unsupported. Avoiding a speculative diagnosis is safer than selecting a category-specific action.",
+        "verification_checklist": [
+          "Retrieve complete, untruncated pipeline logs.",
+          "Collect the missing test report or stage-specific diagnostic output.",
+          "Confirm the stage status and rerun with verbose logging if appropriate."
+        ],
+        "utility_score": null,
+        "candidate_scores": []
+      },
+      "error": null,
+      "evaluation_valid": true
+    },
+    {
+      "evaluation_id": "EVAL-LEARNING-BASED-D",
+      "agent": "Learning-Based Agent",
+      "scenario_id": "D",
+      "scenario_name": "Ambiguous: Test Stage Timed Out With Incomplete Logs",
+      "evaluation_group": "robustness",
+      "expected_category": "unknown",
+      "agent_input_excluded_expected": true,
+      "actual_category": "unknown",
+      "classification": {
+        "expected_category": "unknown",
+        "actual_category": "unknown",
+        "correct": true,
+        "score": 1.0
+      },
+      "evidence_metrics": {
+        "expected_sources": [
+          "build_logs",
+          "dependencies",
+          "pipeline_status",
+          "test_results"
+        ],
+        "predicted_sources": [
+          "build_logs",
+          "dependencies",
+          "pipeline_status",
+          "test_results"
+        ],
+        "true_positive": 4,
+        "false_positive": 0,
+        "false_negative": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0
+      },
+      "recommendation": {
+        "appropriate": true,
+        "score": 1.0,
+        "matched_acceptable_steps": [
+          "collect",
+          "missing",
+          "rerun",
+          "logs"
+        ],
+        "acceptable_next_steps": [
+          "collect",
+          "evidence",
+          "missing",
+          "rerun",
+          "additional",
+          "status",
+          "logs",
+          "timed out",
+          "timeout"
+        ]
+      },
+      "explanation_completeness": {
+        "checks": {
+          "likely_cause_explained": true,
+          "reasoning_provided": true,
+          "decision_rationale_present": true,
+          "verification_checklist_actionable": true
+        },
+        "score": 4,
+        "maximum_score": 4,
+        "percentage": 1.0
+      },
+      "contract": {
+        "valid": true,
+        "problems": []
+      },
+      "scenario_unchanged": true,
+      "agent_output": {
+        "agent": "Learning-Based Agent",
+        "failure_category": "unknown",
+        "supporting_evidence": [
+          "Pipeline status (pipeline_status): {'build': 'passed', 'tests': 'timed_out', 'deployment': 'not_started'}",
+          "Build logs (build_logs): [build] Build completed successfully in 40s\n[test] Running test suite ...\n[test] ... (log truncated: runner lost connection after 30m)\n[pipeline] Stage 'tests' exceeded time limit",
+          "Test results (test_results): {'total': None, 'passed': None, 'failed': None, 'skipped': None, 'failed_tests': [], 'notes': 'No test report produced (runner timed out).'}",
+          "Dependency information (dependencies): {'status': 'unknown', 'changed': [], 'notes': 'Dependency information unavailable.'}"
+        ],
+        "likely_cause": "The available evidence is incomplete or insufficient to determine the failure cause confidently.",
+        "recommended_step": "Collect complete pipeline logs and the missing diagnostic report, then rerun the affected stage with sufficient logging.",
+        "reasoning": "The failure category is unknown or could not be normalized to a supported category. The agent avoids a speculative diagnosis and requests additional evidence.",
+        "verification_checklist": [
+          "Retrieve complete, untruncated pipeline logs.",
+          "Collect missing test reports or stage-specific diagnostic output.",
+          "Confirm the stage status and rerun with verbose logging if appropriate."
+        ],
+        "selected_action_id": null,
+        "success_rate": null,
+        "evidence_relevance": null,
+        "learning_score": null,
+        "candidate_scores": [],
+        "experience_used": null
+      },
+      "error": null,
+      "evaluation_valid": true
+    },
+    {
+      "evaluation_id": "EVAL-UTILITY-BASED-E",
+      "agent": "Utility-Based Agent",
+      "scenario_id": "E",
+      "scenario_name": "Normal: Healthy Pipeline (Control Case)",
+      "evaluation_group": "robustness",
+      "expected_category": "healthy",
+      "agent_input_excluded_expected": true,
+      "actual_category": "healthy",
+      "classification": {
+        "expected_category": "healthy",
+        "actual_category": "healthy",
+        "correct": true,
+        "score": 1.0
+      },
+      "evidence_metrics": {
+        "expected_sources": [
+          "build_logs",
+          "deployment_logs",
+          "health_checks",
+          "pipeline_status",
+          "test_results"
+        ],
+        "predicted_sources": [
+          "build_logs",
+          "dependencies",
+          "deployment_logs",
+          "health_checks",
+          "pipeline_status",
+          "recent_changes",
+          "test_results"
+        ],
+        "true_positive": 5,
+        "false_positive": 2,
+        "false_negative": 0,
+        "precision": 0.7143,
+        "recall": 1.0,
+        "f1_score": 0.8333
+      },
+      "recommendation": {
+        "appropriate": true,
+        "score": 1.0,
+        "matched_acceptable_steps": [
+          "no troubleshooting",
+          "monitor",
+          "no action"
+        ],
+        "acceptable_next_steps": [
+          "no troubleshooting",
+          "monitor",
+          "no action",
+          "healthy"
+        ]
+      },
+      "explanation_completeness": {
+        "checks": {
+          "likely_cause_explained": true,
+          "reasoning_provided": true,
+          "decision_rationale_present": true,
+          "verification_checklist_actionable": true
+        },
+        "score": 4,
+        "maximum_score": 4,
+        "percentage": 1.0
+      },
+      "contract": {
+        "valid": true,
+        "problems": []
+      },
+      "scenario_unchanged": true,
+      "agent_output": {
+        "agent": "Utility-Based Agent",
+        "failure_category": "healthy",
+        "supporting_evidence": [
+          "Pipeline status: {'build': 'passed', 'tests': 'passed', 'deployment': 'passed'}",
+          "Build logs: [build] Build completed successfully in 45s\n[test] 37 passed in 5.1s\n[deploy] Deploying catalog-service v2.3.1 to staging\n[deploy] Readiness probe passed: GET /health returned 200\n[deploy] Deployment healthy",
+          "Test results: {'total': 37, 'passed': 37, 'failed': 0, 'skipped': 0, 'failed_tests': []}",
+          "Recent changes: ['Commit e81c0f4: Added product search pagination']",
+          "Health checks: {'endpoint': '/health', 'expected_status': 200, 'observed_status': 200, 'attempts': 1, 'passed': 1, 'message': 'OK'}",
+          "Dependency information: {'status': 'resolved', 'changed': [], 'notes': 'No dependency changes in this run.'}",
+          "Deployment/runtime logs: [app] Starting catalog-service v2.3.1\n[app] Health endpoint reporting 200 OK"
+        ],
+        "likely_cause": "No pipeline failure is indicated by the supplied scenario.",
+        "recommended_step": "No troubleshooting action required; continue monitoring pipeline health.",
+        "reasoning": "The shared category is healthy, so no failure-specific diagnostic action should be recommended.",
+        "verification_checklist": [
+          "Confirm that build, tests and deployment stages passed.",
+          "Confirm that the deployment health check is successful.",
+          "Continue normal pipeline monitoring."
+        ],
+        "utility_score": null,
+        "candidate_scores": []
+      },
+      "error": null,
+      "evaluation_valid": true
+    },
+    {
+      "evaluation_id": "EVAL-LEARNING-BASED-E",
+      "agent": "Learning-Based Agent",
+      "scenario_id": "E",
+      "scenario_name": "Normal: Healthy Pipeline (Control Case)",
+      "evaluation_group": "robustness",
+      "expected_category": "healthy",
+      "agent_input_excluded_expected": true,
+      "actual_category": "healthy",
+      "classification": {
+        "expected_category": "healthy",
+        "actual_category": "healthy",
+        "correct": true,
+        "score": 1.0
+      },
+      "evidence_metrics": {
+        "expected_sources": [
+          "build_logs",
+          "deployment_logs",
+          "health_checks",
+          "pipeline_status",
+          "test_results"
+        ],
+        "predicted_sources": [
+          "build_logs",
+          "dependencies",
+          "deployment_logs",
+          "health_checks",
+          "pipeline_status",
+          "recent_changes",
+          "test_results"
+        ],
+        "true_positive": 5,
+        "false_positive": 2,
+        "false_negative": 0,
+        "precision": 0.7143,
+        "recall": 1.0,
+        "f1_score": 0.8333
+      },
+      "recommendation": {
+        "appropriate": true,
+        "score": 1.0,
+        "matched_acceptable_steps": [
+          "no troubleshooting",
+          "monitor",
+          "no action"
+        ],
+        "acceptable_next_steps": [
+          "no troubleshooting",
+          "monitor",
+          "no action",
+          "healthy"
+        ]
+      },
+      "explanation_completeness": {
+        "checks": {
+          "likely_cause_explained": true,
+          "reasoning_provided": true,
+          "decision_rationale_present": true,
+          "verification_checklist_actionable": true
+        },
+        "score": 4,
+        "maximum_score": 4,
+        "percentage": 1.0
+      },
+      "contract": {
+        "valid": true,
+        "problems": []
+      },
+      "scenario_unchanged": true,
+      "agent_output": {
+        "agent": "Learning-Based Agent",
+        "failure_category": "healthy",
+        "supporting_evidence": [
+          "Pipeline status (pipeline_status): {'build': 'passed', 'tests': 'passed', 'deployment': 'passed'}",
+          "Build logs (build_logs): [build] Build completed successfully in 45s\n[test] 37 passed in 5.1s\n[deploy] Deploying catalog-service v2.3.1 to staging\n[deploy] Readiness probe passed: GET /health returned 200\n[deploy] Deployment healthy",
+          "Test results (test_results): {'total': 37, 'passed': 37, 'failed': 0, 'skipped': 0, 'failed_tests': []}",
+          "Dependency information (dependencies): {'status': 'resolved', 'changed': [], 'notes': 'No dependency changes in this run.'}",
+          "Recent changes (recent_changes): ['Commit e81c0f4: Added product search pagination']",
+          "Health checks (health_checks): {'endpoint': '/health', 'expected_status': 200, 'observed_status': 200, 'attempts': 1, 'passed': 1, 'message': 'OK'}",
+          "Deployment/runtime logs (deployment_logs): [app] Starting catalog-service v2.3.1\n[app] Health endpoint reporting 200 OK"
+        ],
+        "likely_cause": "No pipeline failure is indicated by the supplied scenario.",
+        "recommended_step": "No troubleshooting action required; continue monitoring pipeline health.",
+        "reasoning": "The shared scenario category is healthy, so no failure-specific diagnostic action should be selected.",
+        "verification_checklist": [
+          "Confirm that build, tests and deployment stages passed.",
+          "Confirm that deployment health checks are successful.",
+          "Continue normal pipeline monitoring."
+        ],
+        "selected_action_id": null,
+        "success_rate": null,
+        "evidence_relevance": null,
+        "learning_score": null,
+        "candidate_scores": [],
+        "experience_used": null
+      },
+      "error": null,
+      "evaluation_valid": true
+    }
+  ],
+  "agent_summaries": {
+    "Utility-Based Agent": {
+      "all_scenarios": {
+        "evaluation_count": 5,
+        "valid_evaluations": 5,
+        "classification_accuracy": 1.0,
+        "mean_evidence_precision": 0.8343,
+        "mean_evidence_recall": 1.0,
+        "mean_evidence_f1": 0.9068,
+        "recommendation_appropriateness": 1.0,
+        "mean_explanation_completeness": 1.0
+      },
+      "primary_scenarios_A_to_C": {
+        "evaluation_count": 3,
+        "valid_evaluations": 3,
+        "classification_accuracy": 1.0,
+        "mean_evidence_precision": 0.819,
+        "mean_evidence_recall": 1.0,
+        "mean_evidence_f1": 0.9003,
+        "recommendation_appropriateness": 1.0,
+        "mean_explanation_completeness": 1.0
+      },
+      "robustness_scenarios_D_to_E": {
+        "evaluation_count": 2,
+        "valid_evaluations": 2,
+        "classification_accuracy": 1.0,
+        "mean_evidence_precision": 0.8572,
+        "mean_evidence_recall": 1.0,
+        "mean_evidence_f1": 0.9166,
+        "recommendation_appropriateness": 1.0,
+        "mean_explanation_completeness": 1.0
+      }
+    },
+    "Learning-Based Agent": {
+      "all_scenarios": {
+        "evaluation_count": 5,
+        "valid_evaluations": 5,
+        "classification_accuracy": 1.0,
+        "mean_evidence_precision": 0.8343,
+        "mean_evidence_recall": 1.0,
+        "mean_evidence_f1": 0.9068,
+        "recommendation_appropriateness": 1.0,
+        "mean_explanation_completeness": 1.0
+      },
+      "primary_scenarios_A_to_C": {
+        "evaluation_count": 3,
+        "valid_evaluations": 3,
+        "classification_accuracy": 1.0,
+        "mean_evidence_precision": 0.819,
+        "mean_evidence_recall": 1.0,
+        "mean_evidence_f1": 0.9003,
+        "recommendation_appropriateness": 1.0,
+        "mean_explanation_completeness": 1.0
+      },
+      "robustness_scenarios_D_to_E": {
+        "evaluation_count": 2,
+        "valid_evaluations": 2,
+        "classification_accuracy": 1.0,
+        "mean_evidence_precision": 0.8572,
+        "mean_evidence_recall": 1.0,
+        "mean_evidence_f1": 0.9166,
+        "recommendation_appropriateness": 1.0,
+        "mean_explanation_completeness": 1.0
+      }
+    }
+  },
+  "learning_before_after_experiment": {
+    "scenario_id": "A",
+    "status": "completed",
+    "feedback_type": "simulated",
+    "experience_file_is_temporary": true,
+    "baseline_recommendation": "Inspect failed unit test results",
+    "baseline_action_id": "inspect_tests",
+    "feedback_events": [
+      {
+        "action_id": "inspect_tests",
+        "succeeded": false,
+        "update": {
+          "failure_category": "unit_test",
+          "action_id": "inspect_tests",
+          "success": 0,
+          "failure": 1,
+          "success_rate": 0.3333
+        }
+      },
+      {
+        "action_id": "inspect_changes",
+        "succeeded": true,
+        "update": {
+          "failure_category": "unit_test",
+          "action_id": "inspect_changes",
+          "success": 1,
+          "failure": 0,
+          "success_rate": 0.6667
+        }
+      }
+    ],
+    "after_feedback_recommendation": "Review recently modified code",
+    "after_feedback_action_id": "inspect_changes",
+    "recommendation_changed": true,
+    "after_feedback_recommendation_appropriate": true,
+    "persisted_experience_snapshot": {
+      "inspect_tests": {
+        "success": 0,
+        "failure": 1
+      },
+      "inspect_changes": {
+        "success": 1,
+        "failure": 0
+      },
+      "inspect_pipeline": {
+        "success": 0,
+        "failure": 0
+      }
+    }
+  }
+}
