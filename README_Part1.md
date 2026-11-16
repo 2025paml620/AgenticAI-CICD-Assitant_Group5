@@ -207,6 +207,6 @@ git add docs/README_Part1.md
 git commit -m "test: document and validate Member 1 classical agents"
 ```
 
-## 9. Member 1 contribution summary
+## 9. Contribution summary
 
-**Shubhra Shrivastava (Member 1)** implemented and documented three classical decision-making agents: Simple Reflex, Model-Based Reflex, and Goal-Based. The modules expose a consistent `decide(scenario)` interface, return evidence-based advisory recommendations, and demonstrate distinct decision mechanisms. Member 1 unit-test cases have shown passing output locally, while Member 4's existing `tests/test_integration.py` is the shared integration-test suite. The next milestone is to run that suite, verify all three agents through the merged runner and Streamlit dashboard, and capture final test results and screenshots.
+**Shubhra Shrivastava (Member 1)** I have implemented and documented three classical decision-making agents: Simple Reflex, Model-Based Reflex, and Goal-Based. The modules expose a consistent `decide(scenario)` interface, return evidence-based advisory recommendations, and demonstrate distinct decision mechanisms. Member 1 unit-test cases have shown passing output locally, while Member 4's existing `tests/test_integration.py` is the shared integration-test suite. The next milestone is to run that suite, verify all three agents through the merged runner and Streamlit dashboard, and capture final test results and screenshots.
