@@ -1,0 +1,45 @@
+
+{
+  "unit_test": {
+    "inspect_tests": {
+      "success": 0,
+      "failure": 0
+    },
+    "inspect_changes": {
+      "success": 0,
+      "failure": 0
+    },
+    "inspect_pipeline": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "dependency": {
+    "inspect_versions": {
+      "success": 0,
+      "failure": 0
+    },
+    "inspect_build_logs": {
+      "success": 0,
+      "failure": 0
+    },
+    "inspect_package_index": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "deployment": {
+    "inspect_health": {
+      "success": 0,
+      "failure": 0
+    },
+    "inspect_runtime_logs": {
+      "success": 0,
+      "failure": 0
+    },
+    "inspect_deployment_changes": {
+      "success": 0,
+      "failure": 0
+    }
+  }
+}

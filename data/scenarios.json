@@ -1,0 +1,225 @@
+{
+  "schema_version": "1.0",
+  "description": "Shared CI/CD pipeline scenarios. Every agent receives the same scenario dictionary (a deep copy) so their decisions can be compared fairly. Data is simulated for demonstration; it is not taken from a real pipeline.",
+  "scenarios": [
+    {
+      "id": "A",
+      "name": "Unit Test Failure After Code Change",
+      "scenario_type": "critical",
+      "description": "A developer modified payment validation logic. The build succeeds but two unit tests fail.",
+      "pipeline_id": "payments-service",
+      "run_id": "run-1042",
+      "branch": "feature/payment-validation",
+      "failure_type": "unit_test",
+      "pipeline_status": {
+        "build": "passed",
+        "tests": "failed",
+        "deployment": "not_started"
+      },
+      "build_logs": "[build] Installing dependencies from requirements.txt ... done\n[build] Compiling payments-service ... done\n[build] Build completed successfully in 48s\n[test] Running 20 tests with pytest\n[test] FAILED tests/test_validator.py::test_rejects_expired_card - AssertionError: expected ValidationError, got None\n[test] FAILED tests/test_validator.py::test_amount_upper_limit - AssertionError: assert 200 == 422\n[test] 18 passed, 2 failed in 6.3s\n[pipeline] Stage 'tests' failed; deployment skipped",
+      "test_results": {
+        "total": 20,
+        "passed": 18,
+        "failed": 2,
+        "skipped": 0,
+        "failed_tests": [
+          {
+            "name": "tests/test_validator.py::test_rejects_expired_card",
+            "error": "AssertionError: expected ValidationError, got None"
+          },
+          {
+            "name": "tests/test_validator.py::test_amount_upper_limit",
+            "error": "AssertionError: assert 200 == 422"
+          }
+        ]
+      },
+      "dependencies": {
+        "status": "resolved",
+        "changed": [],
+        "notes": "No dependency changes in this run."
+      },
+      "recent_changes": [
+        "Commit a1f3c9e: Modified validate_payment() in payments/validator.py (expiry and amount checks refactored)",
+        "Commit 7be2d10: Updated docstrings in payments/models.py"
+      ],
+      "health_checks": {},
+      "deployment_logs": "",
+      "expected": {
+        "failure_category": "unit_test",
+        "acceptable_next_steps": ["failing test", "failed test", "test result", "recent code", "modified", "changed function", "regression"],
+        "rationale": "Build passed, tests failed, and the failing tests target the recently modified validate_payment() function."
+      }
+    },
+    {
+      "id": "B",
+      "name": "Dependency Version Unavailable / Incompatible",
+      "scenario_type": "critical",
+      "description": "requirements.txt was updated to a library version that does not exist on the package index, so the build cannot resolve dependencies.",
+      "pipeline_id": "orders-service",
+      "run_id": "run-2217",
+      "branch": "chore/upgrade-libs",
+      "failure_type": "dependency",
+      "pipeline_status": {
+        "build": "failed",
+        "tests": "not_started",
+        "deployment": "not_started"
+      },
+      "build_logs": "[build] Installing dependencies from requirements.txt\n[build] Collecting requests==2.31.0 ... ok\n[build] Collecting pydantic==3.9.1\n[build] ERROR: Could not find a version that satisfies the requirement pydantic==3.9.1 (from versions: 1.10.13, 2.5.3, 2.7.4)\n[build] ERROR: No matching distribution found for pydantic==3.9.1\n[build] Build failed: dependency resolution error (exit code 1)\n[pipeline] Stage 'build' failed; tests and deployment skipped",
+      "test_results": {
+        "total": 0,
+        "passed": 0,
+        "failed": 0,
+        "skipped": 0,
+        "failed_tests": [],
+        "notes": "Tests did not run because the build failed."
+      },
+      "dependencies": {
+        "status": "unresolved",
+        "changed": [
+          {"package": "pydantic", "from": "2.7.4", "to": "3.9.1", "available": false},
+          {"package": "requests", "from": "2.31.0", "to": "2.31.0", "available": true}
+        ],
+        "notes": "pydantic 3.9.1 is not published on the configured package index."
+      },
+      "recent_changes": [
+        "Commit c42e8b1: Bumped pydantic from 2.7.4 to 3.9.1 in requirements.txt",
+        "Commit 0d91aa4: Updated CI cache key"
+      ],
+      "health_checks": {},
+      "deployment_logs": "",
+      "expected": {
+        "failure_category": "dependency",
+        "acceptable_next_steps": ["dependency", "version", "compatib", "build log", "registry", "package"],
+        "rationale": "Build failed at dependency resolution immediately after the pydantic version bump."
+      }
+    },
+    {
+      "id": "C",
+      "name": "Deployment Health Check Failure After Release",
+      "scenario_type": "critical",
+      "description": "Build and tests pass and the release is deployed, but the service fails its readiness health checks.",
+      "pipeline_id": "inventory-service",
+      "run_id": "run-3380",
+      "branch": "main",
+      "failure_type": "deployment",
+      "pipeline_status": {
+        "build": "passed",
+        "tests": "passed",
+        "deployment": "failed"
+      },
+      "build_logs": "[build] Build completed successfully in 52s\n[test] 64 passed in 11.2s\n[deploy] Deploying inventory-service v1.8.0 to staging\n[deploy] Rolling update started (3 replicas)\n[deploy] Readiness probe failed: GET /health returned 503 (attempt 1/5)\n[deploy] Readiness probe failed: GET /health returned 503 (attempt 5/5)\n[deploy] Deployment health check failed; release marked unhealthy",
+      "test_results": {
+        "total": 64,
+        "passed": 64,
+        "failed": 0,
+        "skipped": 0,
+        "failed_tests": []
+      },
+      "dependencies": {
+        "status": "resolved",
+        "changed": [],
+        "notes": "No dependency changes in this run."
+      },
+      "recent_changes": [
+        "Commit 9f0b7c2: Renamed environment variable DB_URL to DATABASE_URL in config/settings.py",
+        "Commit 55ad3e8: Increased connection pool size"
+      ],
+      "health_checks": {
+        "endpoint": "/health",
+        "expected_status": 200,
+        "observed_status": 503,
+        "attempts": 5,
+        "passed": 0,
+        "message": "Service Unavailable: database connection not configured"
+      },
+      "deployment_logs": "[app] Starting inventory-service v1.8.0\n[app] ERROR: KeyError: 'DATABASE_URL' environment variable not set\n[app] Health endpoint reporting 503: database connection not configured",
+      "expected": {
+        "failure_category": "deployment",
+        "acceptable_next_steps": ["health", "runtime", "deployment", "configuration", "logs"],
+        "rationale": "Build and tests passed; health checks return 503 and runtime logs show a missing environment variable after a config rename."
+      }
+    },
+    {
+      "id": "D",
+      "name": "Ambiguous: Test Stage Timed Out With Incomplete Logs",
+      "scenario_type": "edge",
+      "description": "The test stage timed out. Logs are truncated, no test report was produced and the recent-change summary is unavailable. The failure type cannot be determined with confidence.",
+      "pipeline_id": "notifications-service",
+      "run_id": "run-4091",
+      "branch": "develop",
+      "failure_type": "unknown",
+      "pipeline_status": {
+        "build": "passed",
+        "tests": "timed_out",
+        "deployment": "not_started"
+      },
+      "build_logs": "[build] Build completed successfully in 40s\n[test] Running test suite ...\n[test] ... (log truncated: runner lost connection after 30m)\n[pipeline] Stage 'tests' exceeded time limit",
+      "test_results": {
+        "total": null,
+        "passed": null,
+        "failed": null,
+        "skipped": null,
+        "failed_tests": [],
+        "notes": "No test report produced (runner timed out)."
+      },
+      "dependencies": {
+        "status": "unknown",
+        "changed": [],
+        "notes": "Dependency information unavailable."
+      },
+      "recent_changes": [],
+      "health_checks": {},
+      "deployment_logs": "",
+      "expected": {
+        "failure_category": "unknown",
+        "acceptable_next_steps": ["collect", "evidence", "missing", "rerun", "additional", "status", "logs", "timed out", "timeout"],
+        "rationale": "Evidence is incomplete; a good agent should avoid over-confident classification and ask for more diagnostics (e.g. full logs, test report, rerun with verbose output)."
+      }
+    },
+    {
+      "id": "E",
+      "name": "Normal: Healthy Pipeline (Control Case)",
+      "scenario_type": "normal",
+      "description": "All stages pass and health checks succeed. Used as a control to confirm agents do not invent failures.",
+      "pipeline_id": "catalog-service",
+      "run_id": "run-5120",
+      "branch": "main",
+      "failure_type": "none",
+      "pipeline_status": {
+        "build": "passed",
+        "tests": "passed",
+        "deployment": "passed"
+      },
+      "build_logs": "[build] Build completed successfully in 45s\n[test] 37 passed in 5.1s\n[deploy] Deploying catalog-service v2.3.1 to staging\n[deploy] Readiness probe passed: GET /health returned 200\n[deploy] Deployment healthy",
+      "test_results": {
+        "total": 37,
+        "passed": 37,
+        "failed": 0,
+        "skipped": 0,
+        "failed_tests": []
+      },
+      "dependencies": {
+        "status": "resolved",
+        "changed": [],
+        "notes": "No dependency changes in this run."
+      },
+      "recent_changes": [
+        "Commit e81c0f4: Added product search pagination"
+      ],
+      "health_checks": {
+        "endpoint": "/health",
+        "expected_status": 200,
+        "observed_status": 200,
+        "attempts": 1,
+        "passed": 1,
+        "message": "OK"
+      },
+      "deployment_logs": "[app] Starting catalog-service v2.3.1\n[app] Health endpoint reporting 200 OK",
+      "expected": {
+        "failure_category": "healthy",
+        "acceptable_next_steps": ["no troubleshooting", "monitor", "no action", "healthy"],
+        "rationale": "No failure is present; the right recommendation is to continue monitoring."
+      }
+    }
+  ]
+}
