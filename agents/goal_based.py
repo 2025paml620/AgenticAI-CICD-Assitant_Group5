@@ -3,6 +3,15 @@
 Builds a safe diagnostic plan toward a healthy pipeline. It chooses actions
 based on unmet stage goals and available evidence; it never executes fixes.
 """
+
+# =============================================================================
+# Agentic AI Mini Project: Intelligent CI/CD Pipeline Failure Assistant
+# Member 1: Shubhra Shrivastava
+# Module: Goal-Based Agent
+# Responsibility: Recommend a safe diagnostic plan toward a healthy pipeline.
+# Note: The plan is advisory and is not executed by this module.
+# =============================================================================
+
 from __future__ import annotations
 
 from typing import Any
@@ -15,13 +24,16 @@ class GoalBasedAgent:
     goal = "Build, tests, and deployment all pass."
 
     def decide(self, scenario: dict[str, Any]) -> dict[str, Any]:
+        # Read the same shared scenario representation as the other agents.
         status = scenario.get("pipeline_status", {})
         current = {
             stage: str(status.get(stage, scenario.get(stage, "unknown"))).lower()
             for stage in ("build", "tests", "deployment")
         }
+        # Include the current status of every stage in the recommendation.
         evidence = [f"{stage}={value}" for stage, value in current.items()]
         # The order represents pipeline prerequisites: build -> test -> deploy.
+        # Build is the earliest prerequisite; diagnose it before later stages.
         if current["build"] == "failed":
             category = "dependency_or_build_failure"
             cause = "Build stage is blocking the pipeline goal."
@@ -32,6 +44,7 @@ class GoalBasedAgent:
                 "Verify tests pass before considering deployment readiness.",
             ]
             checks = ["Build passes.", "Tests pass.", "Deployment is verified separately."]
+        # Test failures block safe progression even if the build passed.
         elif current["tests"] == "failed":
             category = "unit_test_failure"
             cause = "Failing tests prevent safe progression toward deployment readiness."
@@ -42,6 +55,7 @@ class GoalBasedAgent:
                 "Verify failing tests and then the full suite pass.",
             ]
             checks = ["Affected tests pass.", "Full test suite passes.", "Build remains successful."]
+        # After build/test stages, focus on runtime and health checks.
         elif current["deployment"] == "failed":
             category = "deployment_health_failure"
             cause = "Deployment health is the remaining unmet pipeline goal."
@@ -52,17 +66,21 @@ class GoalBasedAgent:
                 "Verify service health after an authorized fix.",
             ]
             checks = ["Health checks pass.", "Runtime errors are resolved.", "Deployment status is healthy."]
+        # No repair plan is needed when the stated goal is satisfied.
         elif all(value == "passed" for value in current.values()):
             category = "healthy"
             cause = "All pipeline goals are already satisfied."
             plan = ["Continue monitoring future pipeline runs."]
             checks = ["Monitor subsequent runs."]
+        # An unknown status requires evidence gathering, not speculative fixes.
         else:
             category = "unknown"
             cause = "The observed stages do not establish whether the goal is satisfied."
             plan = ["Collect missing pipeline status and diagnostic evidence.", "Reassess which pipeline goal is unmet."]
             checks = ["All stage statuses are known."]
 
+        # plan contains the ordered recommendation; recommended_step is its first item.
+        # The agent never executes these actions itself.
         return {
             "agent": self.name,
             "failure_category": category,
