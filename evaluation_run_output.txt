@@ -1,0 +1,124 @@
+Member 2 evaluation completed.
+Evaluations: 10
+
+Utility-Based Agent
+{
+  "all_scenarios": {
+    "evaluation_count": 5,
+    "valid_evaluations": 5,
+    "classification_accuracy": 1.0,
+    "mean_evidence_precision": 0.8343,
+    "mean_evidence_recall": 1.0,
+    "mean_evidence_f1": 0.9068,
+    "recommendation_appropriateness": 1.0,
+    "mean_explanation_completeness": 1.0
+  },
+  "primary_scenarios_A_to_C": {
+    "evaluation_count": 3,
+    "valid_evaluations": 3,
+    "classification_accuracy": 1.0,
+    "mean_evidence_precision": 0.819,
+    "mean_evidence_recall": 1.0,
+    "mean_evidence_f1": 0.9003,
+    "recommendation_appropriateness": 1.0,
+    "mean_explanation_completeness": 1.0
+  },
+  "robustness_scenarios_D_to_E": {
+    "evaluation_count": 2,
+    "valid_evaluations": 2,
+    "classification_accuracy": 1.0,
+    "mean_evidence_precision": 0.8572,
+    "mean_evidence_recall": 1.0,
+    "mean_evidence_f1": 0.9166,
+    "recommendation_appropriateness": 1.0,
+    "mean_explanation_completeness": 1.0
+  }
+}
+
+Learning-Based Agent
+{
+  "all_scenarios": {
+    "evaluation_count": 5,
+    "valid_evaluations": 5,
+    "classification_accuracy": 1.0,
+    "mean_evidence_precision": 0.8343,
+    "mean_evidence_recall": 1.0,
+    "mean_evidence_f1": 0.9068,
+    "recommendation_appropriateness": 1.0,
+    "mean_explanation_completeness": 1.0
+  },
+  "primary_scenarios_A_to_C": {
+    "evaluation_count": 3,
+    "valid_evaluations": 3,
+    "classification_accuracy": 1.0,
+    "mean_evidence_precision": 0.819,
+    "mean_evidence_recall": 1.0,
+    "mean_evidence_f1": 0.9003,
+    "recommendation_appropriateness": 1.0,
+    "mean_explanation_completeness": 1.0
+  },
+  "robustness_scenarios_D_to_E": {
+    "evaluation_count": 2,
+    "valid_evaluations": 2,
+    "classification_accuracy": 1.0,
+    "mean_evidence_precision": 0.8572,
+    "mean_evidence_recall": 1.0,
+    "mean_evidence_f1": 0.9166,
+    "recommendation_appropriateness": 1.0,
+    "mean_explanation_completeness": 1.0
+  }
+}
+
+Learning before/after experiment:
+{
+  "scenario_id": "A",
+  "status": "completed",
+  "feedback_type": "simulated",
+  "experience_file_is_temporary": true,
+  "baseline_recommendation": "Inspect failed unit test results",
+  "baseline_action_id": "inspect_tests",
+  "feedback_events": [
+    {
+      "action_id": "inspect_tests",
+      "succeeded": false,
+      "update": {
+        "failure_category": "unit_test",
+        "action_id": "inspect_tests",
+        "success": 0,
+        "failure": 1,
+        "success_rate": 0.3333
+      }
+    },
+    {
+      "action_id": "inspect_changes",
+      "succeeded": true,
+      "update": {
+        "failure_category": "unit_test",
+        "action_id": "inspect_changes",
+        "success": 1,
+        "failure": 0,
+        "success_rate": 0.6667
+      }
+    }
+  ],
+  "after_feedback_recommendation": "Review recently modified code",
+  "after_feedback_action_id": "inspect_changes",
+  "recommendation_changed": true,
+  "after_feedback_recommendation_appropriate": true,
+  "persisted_experience_snapshot": {
+    "inspect_tests": {
+      "success": 0,
+      "failure": 1
+    },
+    "inspect_changes": {
+      "success": 1,
+      "failure": 0
+    },
+    "inspect_pipeline": {
+      "success": 0,
+      "failure": 0
+    }
+  }
+}
+
+Results saved to: /mnt/data/Member2_Evaluation_Framework/evaluation/results/member2_evaluation.json
