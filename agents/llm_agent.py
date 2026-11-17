@@ -106,6 +106,8 @@ class LLMAgent(BaseAgent):
     name = 'LLM Agent'
 
     def __init__(self, model=None, *, model_name=None, timeout=120, max_rounds=6):
+        if isinstance(model, str):
+            model_name, model = model_name or model, None
         self.model = model
         self.model_name = model_name or os.getenv('OLLAMA_MODEL', 'qwen3:4b')
         self.timeout = timeout

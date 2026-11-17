@@ -1,0 +1,9 @@
+# Core
+streamlit>=1.35
+pandas>=2.0
+
+# LLM agent (local Ollama via LangChain)
+-r requirements-llm.txt
+
+# Testing
+pytest>=8.0
