@@ -13,6 +13,7 @@ Ollama server, so its test runs only with RUN_LLM_TESTS=1.
 from __future__ import annotations
 
 import os
+from pathlib import Path
 
 import pytest
 
@@ -164,7 +165,86 @@ def test_comparison_report_for_every_scenario(sid):
 @pytest.mark.skipif(os.environ.get("RUN_LLM_TESTS") != "1", reason="set RUN_LLM_TESTS=1 with Ollama running")
 @pytest.mark.parametrize("sid", list(REQUIRED_SCENARIOS))
 def test_llm_agent_calls_at_least_two_tools(sid):
-    agent = _agent_or_skip(LLM_SPEC)
+    agent, err = load_agent(LLM_SPEC, {"model_name": os.getenv("OLLAMA_MODEL", "qwen3:4b")})
+    assert agent is not None, err
     run = run_agent(LLM_SPEC, agent, agent_input(sid))
     assert run.status == "ok", (run.error, run.problems)
+    assert run.result["status"] == "ok"
+    assert run.result["canonical_category"] == REQUIRED_SCENARIOS[sid]
+    assert run.input_unchanged
     assert len(set(run.result.get("tools_used", []))) >= 2, run.result
+    from agents.llm_agent import Diagnosis, validate_grounding
+    result = run.result
+    fields = {key: result["evidence_citations"] if key == "supporting_evidence" else result[key]
+              for key in Diagnosis.model_fields}
+    validate_grounding(Diagnosis.model_validate(fields), result["tool_calls"])
+    assert result["grounding_review"]["supported"]
+
+
+def test_llm_model_name_is_not_a_model_object():
+    agent, err = load_agent(LLM_SPEC, {"model_name": "qwen3:4b"})
+    assert err is None
+    assert agent.model is None and agent.model_name == "qwen3:4b"
+    legacy, err = load_agent(LLM_SPEC, {"model": "llama3.1:8b"})
+    assert err is None
+    assert legacy.model is None and legacy.model_name == "llama3.1:8b"
+
+
+def test_bad_configuration_is_not_silently_discarded():
+    agent, err = load_agent(LLM_SPEC, {"nonexistent_option": True})
+    assert agent is None and "nonexistent_option" in err
+
+
+def test_llm_success_in_shared_runner():
+    from agents.llm_agent import LLMAgent
+    from tests.test_llm import fake_model
+    _, runs = run_all("A", agents={"llm": (LLMAgent(model=fake_model()), None)})
+    run = runs[0]
+    assert run.status == "ok", (run.error, run.problems)
+    assert run.result["canonical_category"] == "unit_test"
+    assert len(run.result["tool_calls"]) == 4
+    assert run.input_unchanged
+
+
+def test_llm_returned_error_is_not_scored_as_success():
+    from agents.llm_agent import LLMAgent
+    from unittest.mock import Mock
+    model = Mock()
+    model.bind_tools.side_effect = ConnectionError("Ollama unavailable")
+    _, runs = run_all("A", agents={"llm": (LLMAgent(model=model), None)})
+    run = runs[0]
+    assert run.status == "error" and "Ollama unavailable" in run.error
+    assert run.result["status"] == "error"
+    assert summarize(runs, expected_for("A"))["agents_run"] == 0
+    assert comparison_rows(runs, expected_for("A"))[0]["Category correct"] is None
+
+
+def test_registered_tools_without_executed_trace_are_invalid():
+    from tests.test_llm import fake_model
+    from agents.llm_agent import LLMAgent
+    result = LLMAgent(model=fake_model()).decide({"id": "A"})
+    result["tool_calls"] = []
+    class RegistrationOnly:
+        def decide(self, scenario):
+            return result
+    run = run_agent(LLM_SPEC, RegistrationOnly(), agent_input("A"))
+    assert run.status == "invalid"
+    assert any("successful tool calls" in p for p in run.problems)
+
+
+def test_streamlit_runs_llm_and_exposes_trace(monkeypatch):
+    from streamlit.testing.v1 import AppTest
+    from agents.llm_agent import LLMAgent
+    from tests.test_llm import fake_model
+    original = LLMAgent.decide
+    monkeypatch.setattr(LLMAgent, "decide", lambda self, scenario:
+                        original(LLMAgent(model=fake_model()), scenario))
+    app = AppTest.from_file(Path(__file__).resolve().parents[1] / "app.py").run()
+    assert not app.exception
+    assert app.session_state["agents"]["llm"][0].model is None
+    app.button[1].click().run(timeout=30)
+    assert not app.exception
+    run = next(r for r in app.session_state["results"]["runs"] if r.spec.is_llm)
+    assert run.status == "ok"
+    assert len(run.result["tool_calls"]) == 4
+    assert any("Actual tool calls: 4" in caption.value for caption in app.caption)

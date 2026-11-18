@@ -39,9 +39,9 @@ def comparison_rows(runs: list[AgentRun], expected: dict[str, Any]) -> list[dict
             row.update({
                 "Failure category": r["failure_category"],
                 "Canonical": cat,
-                "Category correct": cat == expected["failure_category"],
+                "Category correct": cat == expected["failure_category"] if run.status == "ok" else None,
                 "Recommended step": r["recommended_step"],
-                "Step relevant": step_matches_expected(r["recommended_step"], expected),
+                "Step relevant": step_matches_expected(r["recommended_step"], expected) if run.status == "ok" else None,
                 "Evidence items": len(r["supporting_evidence"]),
                 "Extra": _extra_summary(r),
                 "Time (s)": round(run.seconds, 3),
@@ -71,7 +71,7 @@ def _extra_summary(result: dict[str, Any]) -> str:
 
 def summarize(runs: list[AgentRun], expected: dict[str, Any]) -> dict[str, Any]:
     """Aggregate agreement and correctness numbers for one scenario."""
-    ok = [r for r in runs if r.result]
+    ok = [r for r in runs if r.result and r.status == "ok"]
     cats = Counter(r.result["canonical_category"] for r in ok)
     steps = {r.result["recommended_step"] for r in ok}
     majority, majority_n = cats.most_common(1)[0] if cats else ("-", 0)
@@ -83,7 +83,7 @@ def summarize(runs: list[AgentRun], expected: dict[str, Any]) -> dict[str, Any]:
         "majority_category": majority,
         "category_agreement": f"{majority_n}/{len(ok)}" if ok else "0/0",
         "distinct_steps": len(steps),
-        "all_inputs_unchanged": all(r.input_unchanged for r in ok),
+        "all_inputs_unchanged": all(r.input_unchanged for r in runs),
     }
 
 
@@ -91,7 +91,7 @@ def explain_differences(runs: list[AgentRun], expected: dict[str, Any]) -> list[
     """Plain-language explanation of why the agents' decisions differ."""
     lines = []
     for run in runs:
-        if not run.result:
+        if not run.result or run.status != "ok":
             lines.append(f"**{run.spec.display_name}** - not compared ({run.status}: {run.error}).")
             continue
         r = run.result
@@ -101,7 +101,7 @@ def explain_differences(runs: list[AgentRun], expected: dict[str, Any]) -> list[
             f"which {verdict} the expected `{expected['failure_category']}`. "
             f"It recommends: *{r['recommended_step']}*"
         )
-    ok = [r for r in runs if r.result]
+    ok = [r for r in runs if r.result and r.status == "ok"]
     if ok and len({r.result["canonical_category"] for r in ok}) > 1:
         lines.append(
             "Categories disagree: rule/state-driven agents classify from stage statuses, while the "

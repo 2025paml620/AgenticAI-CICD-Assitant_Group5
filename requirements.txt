@@ -3,8 +3,7 @@ streamlit>=1.35
 pandas>=2.0
 
 # LLM agent (local Ollama via LangChain)
-langchain-core>=0.3
-langchain-ollama>=0.2
+-r requirements-llm.txt
 
 # Testing
 pytest>=8.0

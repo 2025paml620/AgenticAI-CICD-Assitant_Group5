@@ -28,14 +28,13 @@ def get_agents(model: str) -> dict:
     """Agents are kept in the session so stateful agents (model-based memory,
     learning history) persist across runs until the user resets them."""
     if st.session_state.get("agents_model") != model or "agents" not in st.session_state:
-        os.environ["OLLAMA_MODEL"] = model
-        st.session_state["agents"] = load_agents(factory_kwargs={"llm": {"model": model}})
+        st.session_state["agents"] = load_agents(factory_kwargs={"llm": {"model_name": model}})
         st.session_state["agents_model"] = model
     return st.session_state["agents"]
 
 
 def reset_agents() -> None:
-    for key in ("agents", "agents_model", "results", "matrix"):
+    for key in ("agents", "agents_model", "results", "matrix", "auto_ran"):
         st.session_state.pop(key, None)
 
 
@@ -168,6 +167,8 @@ for run in runs:
         r = run.result
         if run.problems:
             st.warning("Output contract issues: " + "; ".join(run.problems))
+        if run.error:
+            st.error(run.error)
         left, right = st.columns(2)
         with left:
             st.markdown(f"**Failure category:** `{r['failure_category']}` (canonical `{r['canonical_category']}`)")
@@ -194,10 +195,17 @@ for run in runs:
             st.json(r["experience_used"], expanded=False)
         if r.get("tools_used") or r.get("tool_calls"):
             st.markdown("**LLM tool-call evidence**")
+            st.caption(f"Model: {r.get('model', model)} · Actual tool calls: {len(r.get('tool_calls', []))}")
             if r.get("tools_used"):
                 st.write("Tools called: " + ", ".join(map(str, r["tools_used"])))
-            for call in r.get("tool_calls") or []:
-                st.code(json.dumps(call, indent=2, default=str)[:3000], language="json")
+            if r.get("grounding_review"):
+                st.write("Grounding review: " + ("passed" if r["grounding_review"].get("supported") else "rejected"))
+            st.download_button("Download LLM diagnosis and full trace", json.dumps(r, indent=2, default=str),
+                               file_name=f"llm_scenario_{scenario_id}.json", mime="application/json",
+                               key=f"download_{run.spec.key}_{scenario_id}")
+            with st.expander("Executed tools and returned evidence", expanded=False):
+                for call in r.get("tool_calls") or []:
+                    st.json(call, expanded=False)
 
         # Simulated feedback for the Learning agent (if it exposes record_outcome).
         agent_obj = agents.get(run.spec.key, (None, None))[0]

@@ -108,11 +108,6 @@ def load_agent(spec: AgentSpec, factory_kwargs: dict[str, Any] | None = None) ->
         return None, f"No agent class with decide() found in {spec.module}"
     try:
         return cls(**(factory_kwargs or {})), None
-    except TypeError:
-        try:
-            return cls(), None
-        except Exception as exc:  # noqa: BLE001
-            return None, f"Could not create {cls.__name__}: {exc}"
     except Exception as exc:  # noqa: BLE001
         return None, f"Could not create {cls.__name__}: {exc}"
 
@@ -143,6 +138,19 @@ def run_agent(spec: AgentSpec, agent: Any, scenario: dict[str, Any]) -> AgentRun
     problems = validate_result(raw)
     if not isinstance(raw, dict):
         return AgentRun(spec, "invalid", error="Agent did not return a dict", problems=problems, seconds=seconds)
+    if raw.get("status") == "error":
+        return AgentRun(spec, "error", result=normalize_result(raw, spec.display_name),
+                        error=str(raw.get("reasoning", "Agent reported a diagnostic error")),
+                        problems=problems, seconds=seconds, input_unchanged=(own_copy == scenario))
+    if spec.is_llm:
+        successful = [call for call in raw.get("tool_calls", [])
+                      if isinstance(call, dict) and "output" in call and "error" not in call
+                      and call.get("args") == {"scenario_id": scenario.get("id")}]
+        invoked = {call.get("name") for call in successful if call.get("name")}
+        if len(invoked) < 2:
+            problems.append("LLM requires at least two distinct successful tool calls for this scenario")
+        if set(raw.get("tools_used", [])) != invoked:
+            problems.append("tools_used does not match the executed tool trace")
     return AgentRun(
         spec,
         "ok" if not problems else "invalid",
