@@ -242,7 +242,8 @@ def test_streamlit_runs_llm_and_exposes_trace(monkeypatch):
     app = AppTest.from_file(Path(__file__).resolve().parents[1] / "app.py").run()
     assert not app.exception
     assert app.session_state["agents"]["llm"][0].model is None
-    app.button[1].click().run(timeout=30)
+    run_button = next(b for b in app.button if "Run all selected agents" in b.label)
+    run_button.click().run(timeout=30)
     assert not app.exception
     run = next(r for r in app.session_state["results"]["runs"] if r.spec.is_llm)
     assert run.status == "ok"

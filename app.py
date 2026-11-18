@@ -185,11 +185,14 @@ for run in runs:
         if r.get("plan"):
             st.markdown("**Plan:** " + " → ".join(r["plan"]))
         if r.get("candidate_scores"):
-            st.markdown("**Utility scores of candidate actions**")
-            st.dataframe(
-                pd.DataFrame(r["candidate_scores"]).sort_values("utility_score", ascending=False),
-                hide_index=True, use_container_width=True,
-            )
+            # Utility agent ranks by utility_score, Learning agent by learning_score.
+            scores = pd.DataFrame(r["candidate_scores"])
+            score_col = next((c for c in ("utility_score", "learning_score") if c in scores.columns), None)
+            label = {"utility_score": "Utility", "learning_score": "Learning"}.get(score_col, "Candidate")
+            st.markdown(f"**{label} scores of candidate actions**")
+            if score_col:
+                scores = scores.sort_values(score_col, ascending=False)
+            st.dataframe(scores, hide_index=True, use_container_width=True)
         if r.get("experience_used"):
             st.markdown("**Experience used**")
             st.json(r["experience_used"], expanded=False)
