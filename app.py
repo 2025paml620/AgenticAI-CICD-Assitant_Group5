@@ -169,6 +169,8 @@ for run in runs:
             st.warning("Output contract issues: " + "; ".join(run.problems))
         if run.error:
             st.error(run.error)
+        if r.get("grounding_warning"):
+            st.warning(r["grounding_warning"])
         left, right = st.columns(2)
         with left:
             st.markdown(f"**Failure category:** `{r['failure_category']}` (canonical `{r['canonical_category']}`)")
@@ -202,7 +204,8 @@ for run in runs:
             if r.get("tools_used"):
                 st.write("Tools called: " + ", ".join(map(str, r["tools_used"])))
             if r.get("grounding_review"):
-                st.write("Grounding review: " + ("passed" if r["grounding_review"].get("supported") else "rejected"))
+                st.write("Grounding review: " + ("passed" if r["grounding_review"].get("supported")
+                                                 else "not confirmed (diagnosis shown as unverified)"))
             st.download_button("Download LLM diagnosis and full trace", json.dumps(r, indent=2, default=str),
                                file_name=f"llm_scenario_{scenario_id}.json", mime="application/json",
                                key=f"download_{run.spec.key}_{scenario_id}")

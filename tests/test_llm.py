@@ -111,12 +111,55 @@ class LLMTests(unittest.TestCase):
         model.with_structured_output.return_value.invoke.side_effect = [{'failure_category': 'unit_test'}]
         self.assertEqual(LLMAgent(model=model).decide({'id': 'A'})['status'], 'error')
 
-    def test_unsupported_recommendation_review_rejected(self):
+    def test_review_rejection_keeps_diagnosis_as_unverified(self):
         model = fake_model()
         diagnosis = model.with_structured_output.return_value.invoke.return_value
         model.with_structured_output.return_value.invoke.side_effect = [
             diagnosis, GroundingReview(supported=False, explanation='Unsupported recommendation')]
-        self.assertEqual(LLMAgent(model=model).decide({'id': 'A'})['status'], 'error')
+        result = LLMAgent(model=model).decide({'id': 'A'})
+        self.assertEqual(result['status'], 'ok')
+        self.assertEqual(result['failure_category'], 'unit_test')
+        self.assertFalse(result['verified'])
+        self.assertIn('Unsupported recommendation', result['grounding_warning'])
+        self.assertEqual(validate_result(result), [])
+
+    def test_review_failure_keeps_diagnosis_as_unverified(self):
+        model = fake_model()
+        diagnosis = model.with_structured_output.return_value.invoke.return_value
+        model.with_structured_output.return_value.invoke.side_effect = [diagnosis, ValueError('bad review JSON')]
+        result = LLMAgent(model=model).decide({'id': 'A'})
+        self.assertEqual(result['status'], 'ok')
+        self.assertFalse(result['verified'])
+        self.assertIn('Review unavailable', result['grounding_warning'])
+
+    def test_supported_review_is_verified(self):
+        result = LLMAgent(model=fake_model()).decide({'id': 'A'})
+        self.assertTrue(result['verified'])
+        self.assertNotIn('grounding_warning', result)
+
+    def test_repeated_tool_calls_are_not_duplicated_in_trace(self):
+        model = fake_model()
+        first = [{'id': str(i), 'name': t.name, 'args': {'scenario_id': 'A'}} for i, t in enumerate(PIPELINE_TOOLS)]
+        repeat = [{'id': f'r{i}', 'name': t.name, 'args': {'scenario_id': 'A'}} for i, t in enumerate(PIPELINE_TOOLS)]
+        model.bind_tools.return_value.invoke.side_effect = [AIMessage(content='', tool_calls=first[:2] + repeat[:2]),
+                                                           AIMessage(content='', tool_calls=first[2:])]
+        result = LLMAgent(model=model).decide({'id': 'A'})
+        self.assertEqual(result['status'], 'ok')
+        self.assertEqual([r['id'] for r in result['tool_calls']], ['0', '1', '2', '3'])
+        messages = model.bind_tools.return_value.invoke.call_args_list[1].args[0]
+        self.assertEqual(sum(m.type == 'tool' for m in messages), 6)  # every call id (incl. repeats) answered
+
+    def test_error_guidance_matches_cause(self):
+        model = Mock()
+        model.bind_tools.return_value.invoke.side_effect = ConnectionError('offline')
+        self.assertIn('Ollama is running', LLMAgent(model=model).decide({'id': 'A'})['recommended_step'])
+        model = fake_model()
+        model.with_structured_output.return_value.invoke.side_effect = ValueError(
+            'structured output is unavailable (status code: 501)')
+        self.assertIn('structured JSON', LLMAgent(model=model).decide({'id': 'A'})['recommended_step'])
+        model = fake_model()
+        model.with_structured_output.return_value.invoke.return_value.supporting_evidence[0].quote = 'invented evidence'
+        self.assertIn('failed validation', LLMAgent(model=model).decide({'id': 'A'})['recommended_step'])
 
     def test_bad_citation_can_be_corrected(self):
         model = fake_model()

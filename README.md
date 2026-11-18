@@ -212,11 +212,18 @@ contains only successfully executed tools. Structured answers must cite exact
 returned evidence from at least two distinct tools (JSON projections are checked
 against the returned keys and values). Stage/category contradictions,
 fabricated citations, malformed output, missing evidence, unavailable models and
-timeouts produce an explicit `status: error` / `unknown` result with the partial trace.
-All four tools are collected so diagnosis can relate failures to recent changes.
+timeouts produce an explicit `status: error` / `unknown` result with the partial trace,
+and a `recommended_step` that matches the cause (Ollama unreachable or model missing,
+model without structured output or tool calling, or output that failed validation).
+All four tools are collected so diagnosis can relate failures to recent changes. A
+repeated call to a tool that already succeeded is answered from its first result and
+is not added to the trace again.
 An additional structured model review checks claims, causes, recommendations and
-verification against returned evidence and rejects unsupported diagnoses. This
-semantic check is probabilistic; review the saved trace alongside the recommendation.
+verification against returned evidence. This semantic check is probabilistic, so it
+does not discard a diagnosis that already passed the citation and stage checks: the
+result carries `verified: true` when the review confirms it, and `verified: false`
+plus a `grounding_warning` (shown in the dashboard) when the review rejects it or
+fails. Review the saved trace alongside an unverified recommendation.
 
 Only fixture reads are exposed to the model. Recommendations are advisory; the
 agent cannot run shell commands, modify code, or deploy. The optional CLI output
