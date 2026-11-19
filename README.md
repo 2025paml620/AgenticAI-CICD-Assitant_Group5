@@ -117,6 +117,71 @@ ollama list
 
 ## Run
 
+### Windows / PowerShell quick start
+
+Run from the repository folder. These commands use the project interpreter
+directly, so virtual-environment activation is not required:
+
+```powershell
+cd C:\Users\amgka\workspace\Bits\Electives\agentic_ai
+# Create the environment only if .venv does not already exist:
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt -c constraints-windows.txt
+.\.venv\Scripts\python.exe -m streamlit run app.py --server.address 127.0.0.1 --server.port 8501
+```
+
+Leave that terminal running and open **http://127.0.0.1:8501** in your browser.
+Stop the server with Ctrl+C. If port 8501 is occupied, use `--server.port 8502`
+and open http://127.0.0.1:8502 instead.
+
+Test the flow in two steps:
+
+1. Uncheck **LLM (Ollama + tools)**, choose scenario A, and click
+   **Run all selected agents**. Check the comparison and agent decisions.
+2. Start the Ollama application, run `ollama list` in another terminal, and
+   run `ollama pull qwen3:4b` if the model is missing. Check the LLM agent again,
+   enter `qwen3:4b` as the model, and rerun. Repeat for B and C. Expected categories
+   are `unit_test`, `dependency`, and `deployment`. Expand the LLM decision and
+   **Executed tools and returned evidence** to inspect actual calls; use
+   **Download LLM diagnosis and full trace** to save the evidence.
+
+If Ollama is not responding, run `ollama serve` in a separate terminal. If it
+reports the address is already in use, Ollama is already serving.
+
+Troubleshooting:
+
+- **`streamlit` is not recognized / module not found:** use the full
+  `.\.venv\Scripts\python.exe -m streamlit` command above and install requirements
+  with that same interpreter. In PyCharm, select `.venv\Scripts\python.exe`.
+- **NumPy/Pandas/PyArrow DLL import failure:** first stop every old Streamlit
+  terminal with Ctrl+C and restart the app. A server started before package changes
+  may retain old imports. Check fresh imports with
+  `.\.venv\Scripts\python.exe -c "import pyarrow.compute, pandas; print('Imports OK')"`.
+  The Windows constraints select the versions
+  verified for this project. Repair the installation with
+  `.\.venv\Scripts\python.exe -m pip install --force-reinstall -r requirements.txt -c constraints-windows.txt`.
+  Windows previously blocked a binary from a newer NumPy wheel on this machine.
+  If the fresh import still reports an Application Control block, retain the
+  traceback and consult the device administrator; do not disable the policy.
+- **Blank page / only a heading:** open the local URL above and check the terminal
+  running Streamlit for its traceback. Start `app.py` with `-m streamlit run`,
+  rather than running it as a plain Python script.
+- **LLM error:** inspect the red error and partial tool trace. Confirm the model
+  name matches `ollama list`, then reset agents and rerun. A failed diagnosis is
+  reported as an error rather than counted as a successful comparison.
+
+Verify locally:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests/test_integration.py -q
+# Optional: real Ollama acceptance for A, B and C (can take several minutes):
+$env:RUN_LLM_TESTS = '1'
+.\.venv\Scripts\python.exe -m pytest tests/test_integration.py -k llm_agent_calls -v
+Remove-Item Env:RUN_LLM_TESTS
+```
+
+### Other environments
+
 ```bash
 streamlit run app.py
 ```
