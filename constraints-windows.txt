@@ -1,0 +1,4 @@
+# Versions verified on Windows with Python 3.13.
+numpy==2.2.6
+pandas==2.3.3
+pyarrow==26.0.1
