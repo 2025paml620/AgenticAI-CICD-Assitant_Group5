@@ -26,7 +26,12 @@ def get_test_results(scenario_id: str) -> dict:
 @tool
 def get_recent_change_summary(scenario_id: str) -> dict:
     """Read recent commit summaries; an empty list means unavailable evidence."""
-    return {'recent_changes': agent_input(scenario_id).get('recent_changes')}
+    changes = agent_input(scenario_id).get('recent_changes') or []
+    if changes:
+        return {'recent_changes': changes}
+    # State the absence explicitly so "no data" is reported as citable evidence
+    # rather than an empty payload that the agent rejects as a failed call.
+    return {'recent_changes': [], 'notes': 'No recent-change information available for this run.'}
 
 
 PIPELINE_TOOLS = [get_pipeline_status, read_build_logs, get_test_results, get_recent_change_summary]

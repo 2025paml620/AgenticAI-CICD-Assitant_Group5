@@ -32,8 +32,10 @@ class Diagnosis(BaseModel):
 
 
 class GroundingReview(BaseModel):
-    supported: bool
+    # explanation comes first so the model reasons before committing to a verdict
+    # (verdict-first made small models rationalise a premature 'false').
     explanation: str
+    supported: bool
 
 
 SYSTEM = '''You diagnose CI/CD fixtures. You are advisory only. Never execute changes,
@@ -242,7 +244,10 @@ class LLMAgent(BaseAgent):
                                   'irrelevant recommendations or verification steps. A likely cause may be '
                                   'an explicitly tentative inference from evidence. Proposed actions need '
                                   'not have occurred. Return supported=false if any claim lacks support.'),
-                    HumanMessage(content=json.dumps({'tool_evidence': trace, 'diagnosis': diagnosis.model_dump()}))])
+                    # failure_category is enforced deterministically above, so the review
+                    # audits only the free-text claims (small models second-guess the taxonomy).
+                    HumanMessage(content=json.dumps({'tool_evidence': trace, 'diagnosis': diagnosis.model_dump(
+                        exclude={'failure_category'})}))])
                 review = GroundingReview.model_validate(review)
             except Exception as exc:  # noqa: BLE001 - review is advisory
                 review = GroundingReview(supported=False, explanation=f'Review unavailable: {type(exc).__name__}: {exc}')
