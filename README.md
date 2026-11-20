@@ -282,6 +282,11 @@ All four tools are collected so diagnosis can relate failures to recent changes.
 An additional structured model review checks claims, causes, recommendations and
 verification against returned evidence and rejects unsupported diagnoses. This
 semantic check is probabilistic; review the saved trace alongside the recommendation.
+The review must identify concrete unsupported claims when rejecting an answer.
+An inconsistent verdict (for example, rejection without any unsupported claim)
+is reviewed once more against the same evidence. Both attempts are recorded in
+`grounding_review_attempts`; an unresolved inconsistency remains an error. This
+does not bypass citation validation or accept an answer based on explanation text.
 
 Only fixture reads are exposed to the model. Recommendations are advisory; the
 agent cannot run shell commands, modify code, or deploy. The optional CLI output

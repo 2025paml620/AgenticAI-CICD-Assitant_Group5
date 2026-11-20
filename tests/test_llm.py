@@ -115,7 +115,37 @@ class LLMTests(unittest.TestCase):
         model = fake_model()
         diagnosis = model.with_structured_output.return_value.invoke.return_value
         model.with_structured_output.return_value.invoke.side_effect = [
-            diagnosis, GroundingReview(supported=False, explanation='Unsupported recommendation')]
+            diagnosis, GroundingReview(supported=False, explanation='Unsupported recommendation',
+                                       unsupported_claims=['Deploy a different service'])]
+        self.assertEqual(LLMAgent(model=model).decide({'id': 'A'})['status'], 'error')
+
+    def test_contradictory_review_is_rechecked(self):
+        model = fake_model()
+        diagnosis = model.with_structured_output.return_value.invoke.return_value
+        model.with_structured_output.return_value.invoke.side_effect = [diagnosis,
+            GroundingReview(supported=False, explanation='Therefore, the diagnosis is supported.'),
+            GroundingReview(supported=True, explanation='The tentative cause is supported.')]
+        result = LLMAgent(model=model).decide({'id': 'A'})
+        self.assertEqual(result['status'], 'ok')
+        self.assertEqual(len(result['grounding_review_attempts']), 2)
+        self.assertEqual(len(result['tool_calls']), 4)
+
+    def test_persistent_contradiction_fails_closed(self):
+        model = fake_model()
+        diagnosis = model.with_structured_output.return_value.invoke.return_value
+        bad = GroundingReview(supported=False, explanation='The diagnosis is supported.')
+        model.with_structured_output.return_value.invoke.side_effect = [diagnosis, bad, bad]
+        result = LLMAgent(model=model).decide({'id': 'A'})
+        self.assertEqual(result['status'], 'error')
+        self.assertIn('remained inconsistent', result['reasoning'])
+        self.assertEqual(len(result['grounding_review_attempts']), 2)
+
+    def test_approval_with_unsupported_claims_is_not_accepted(self):
+        model = fake_model()
+        diagnosis = model.with_structured_output.return_value.invoke.return_value
+        bad = GroundingReview(supported=True, explanation='Contains a fabricated cause.',
+                              unsupported_claims=['An unrelated database failed.'])
+        model.with_structured_output.return_value.invoke.side_effect = [diagnosis, bad, bad]
         self.assertEqual(LLMAgent(model=model).decide({'id': 'A'})['status'], 'error')
 
     def test_bad_citation_can_be_corrected(self):
